@@ -1,39 +1,52 @@
 @startuml
 
 class TeachingRequirement {
-    - courseNames: String[]
+    - id: int
+    - subject: String
     - numberOfTeachersNeeded: int
-    - qualifications: String[]
+    - qualificationsRequired: String[]
+    - courseNames: String[]
 }
 
 class Teacher {
+    - id: int
     - name: String
+    - availabilities: String[]
     - qualifications: String[]
-    - availability: String
+    - experience: String
+    - canTeach: List<Subject>
+}
+
+class FileDatabase {
+    - teachers: Teacher[]
+    + addTeacher(teacher: Teacher): void
+    + updateTeacher(teacher: Teacher): void
+    + deleteTeacher(teacherId: int): void
+    + getTeacher(teacherId: int): Teacher
 }
 
 class MatchingSystem {
-    + retrieveRequirements(): TeachingRequirement[]
+    + retrieveRequirements(semester: String): TeachingRequirement[]
     + retrieveTeacherInfo(): Teacher[]
-    + matchTeachersWithRequirements(): Match[]
+    + matchTeachersWithRequirements(teachingRequirements: TeachingRequirement[], teachers: Teacher[]): Match[]
+}
+
+class Administrator {
+    + displayAllTeachingRequirements(semester: String): void
+    + inputTeacher(teacher: Teacher): void
+    + inputTeachingRequirement(requirement: TeachingRequirement): void
+    + matchCoursesToTeachers(): void
 }
 
 class SchedulingSystem {
     + presentAvailableSlots(): Slot[]
-    + confirmSchedule(): void
+    + confirmSchedule(trainingSessions: TrainingSession[]): void
 }
 
 class SystemInterface {
     + inputTeachingRequirements(): void
     + viewTeachingRequirements(): void
     + maintainTeacherDatabase(): void
-}
-
-class DatabaseSystem {
-    + addAction(action: String, teacher: Teacher): void
-    + updateAction(action: String, teacher: Teacher): void
-    + removeAction(action: String, teacher: Teacher): void
-    + confirmCompletion(): boolean
 }
 
 class System {
@@ -45,9 +58,11 @@ class System {
 
 TeachingRequirement "1" *-- "1" System : contains >
 Teacher "1" *-- "1" System : contains >
+Teacher "1" -- "1" FileDatabase : stored in >
 SystemInterface "1" -- "1" System : uses >
 MatchingSystem "1" -- "1" System : uses >
 SchedulingSystem "1" -- "1" System : uses >
-DatabaseSystem "1" -- "1" System : uses >
+Administrator "1" -- "1" System : uses >
+FileDatabase "1" -- "1" System : uses >
 
 @enduml
