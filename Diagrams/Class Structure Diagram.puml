@@ -3,7 +3,6 @@
 class TeachingRequirement {
     - id: int
     - subject: String
-    - numberOfTeachersNeeded: int
     - qualificationsRequired: String[]
     - courseNames: String[]
 }
@@ -11,18 +10,21 @@ class TeachingRequirement {
 class Teacher {
     - id: int
     - name: String
-    - availabilities: String[]
+    - availabilities: Date[]
     - qualifications: String[]
     - experience: String
     - canTeach: List<Subject>
+    - trainingSessions: List<TrainingSession>
 }
 
-class FileDatabase {
+class TeacherDatabase {
     - teachers: Teacher[]
     + addTeacher(teacher: Teacher): void
     + updateTeacher(teacher: Teacher): void
     + deleteTeacher(teacherId: int): void
     + getTeacher(teacherId: int): Teacher
+    + loadFromFile(): void
+    + saveToFile(): void
 }
 
 class MatchingSystem {
@@ -34,13 +36,25 @@ class MatchingSystem {
 class Administrator {
     + displayAllTeachingRequirements(semester: String): void
     + inputTeacher(teacher: Teacher): void
-    + inputTeachingRequirement(requirement: TeachingRequirement): void
     + matchCoursesToTeachers(): void
 }
 
+class ClassDirector {
+    + inputTeachingRequirement(requirement: TeachingRequirement): void
+    + viewTeachingRequirement(semester: String): void
+}
+
 class SchedulingSystem {
-    + presentAvailableSlots(): Slot[]
+    + presentAvailableSlots(): TrainingSession[]
     + confirmSchedule(trainingSessions: TrainingSession[]): void
+}
+
+class TrainingSession {
+    - id: int
+    - date: Date
+    - teacher: Teacher
+    - subject: String
+    - course: String
 }
 
 class SystemInterface {
@@ -58,11 +72,14 @@ class System {
 
 TeachingRequirement "1" *-- "1" System : contains >
 Teacher "1" *-- "1" System : contains >
-Teacher "1" -- "1" FileDatabase : stored in >
+Teacher "1" -- "1" TeacherDatabase : stored in >
 SystemInterface "1" -- "1" System : uses >
 MatchingSystem "1" -- "1" System : uses >
 SchedulingSystem "1" -- "1" System : uses >
 Administrator "1" -- "1" System : uses >
-FileDatabase "1" -- "1" System : uses >
+ClassDirector "1" -- "1" System : uses >
+TeacherDatabase "1" -- "1" System : uses >
+TrainingSession "*" -- "1" Teacher : conducted for >
+TrainingSession "*" -- "1" TeachingRequirement : addresses >
 
 @enduml
