@@ -1,0 +1,53 @@
+@startuml
+
+class TeachingRequirement {
+    - courseNames: String[]
+    - numberOfTeachersNeeded: int
+    - qualifications: String[]
+}
+
+class Teacher {
+    - name: String
+    - qualifications: String[]
+    - availability: String
+}
+
+class MatchingSystem {
+    + retrieveRequirements(): TeachingRequirement[]
+    + retrieveTeacherInfo(): Teacher[]
+    + matchTeachersWithRequirements(): Match[]
+}
+
+class SchedulingSystem {
+    + presentAvailableSlots(): Slot[]
+    + confirmSchedule(): void
+}
+
+class SystemInterface {
+    + inputTeachingRequirements(): void
+    + viewTeachingRequirements(): void
+    + maintainTeacherDatabase(): void
+}
+
+class DatabaseSystem {
+    + addAction(action: String, teacher: Teacher): void
+    + updateAction(action: String, teacher: Teacher): void
+    + removeAction(action: String, teacher: Teacher): void
+    + confirmCompletion(): boolean
+}
+
+class System {
+    - teachingRequirements: TeachingRequirement[]
+    - teachers: Teacher[]
+    + saveData(): void
+    + loadData(): void
+}
+
+TeachingRequirement "1" *-- "1" System : contains >
+Teacher "1" *-- "1" System : contains >
+SystemInterface "1" -- "1" System : uses >
+MatchingSystem "1" -- "1" System : uses >
+SchedulingSystem "1" -- "1" System : uses >
+DatabaseSystem "1" -- "1" System : uses >
+
+@enduml

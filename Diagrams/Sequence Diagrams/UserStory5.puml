@@ -1,0 +1,8 @@
+@startuml
+actor Administrator
+entity "Scheduling System" as SchedulingSystem
+Administrator -> SchedulingSystem: decides to schedule training.
+SchedulingSystem -> Administrator: presents available slots.
+Administrator -> SchedulingSystem: selects appropriate slots and assigns teachers.
+SchedulingSystem -> Administrator: confirms the training schedule.
+@enduml

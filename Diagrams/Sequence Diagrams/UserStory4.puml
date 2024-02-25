@@ -1,0 +1,9 @@
+@startuml
+actor Administrator
+entity "Matching System" as MatchingSystem
+Administrator -> MatchingSystem: initiates the matching process.
+MatchingSystem -> MatchingSystem: retrieves teaching requirements and teacher information.
+MatchingSystem -> MatchingSystem: applies matching criteria.
+MatchingSystem -> Administrator: presents potential matches.
+Administrator -> MatchingSystem: approves or modifies the matches.
+@enduml

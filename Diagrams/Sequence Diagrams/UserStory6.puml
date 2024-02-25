@@ -1,0 +1,7 @@
+@startuml
+entity System
+actor "Part-time Teacher" as PartTimeTeacher
+System -> PartTimeTeacher: generates assignment confirmation.
+System -> PartTimeTeacher: sends confirmation.
+PartTimeTeacher -> System: receives and acknowledges the assignment.
+@enduml

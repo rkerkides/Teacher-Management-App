@@ -1,0 +1,7 @@
+@startuml
+actor Administrator
+entity System
+Administrator -> System: requests to view teaching requirements.
+System -> System: retrieves the requirements from storage.
+System -> Administrator: displays the requirements to the Administrator.
+@enduml

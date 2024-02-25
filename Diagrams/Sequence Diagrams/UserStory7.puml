@@ -1,0 +1,6 @@
+@startuml
+entity System
+System -> System: trigger event to save data (e.g., application close).
+System -> System: gathers current state data.
+System -> System: writes data to storage.
+@enduml

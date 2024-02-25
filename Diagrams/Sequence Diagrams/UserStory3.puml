@@ -1,0 +1,7 @@
+@startuml
+actor Administrator
+database "Database System" as DatabaseSystem
+Administrator -> DatabaseSystem: adds, updates, or removes teacher information.
+DatabaseSystem -> DatabaseSystem: processes the action.
+DatabaseSystem -> Administrator: confirms the action completion.
+@enduml
