@@ -1,20 +1,39 @@
+package model;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import interfaces.Identifiable;
 
-public class Teacher implements Serializable {
+public class Teacher implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private int id;
+    private int highestID;
     private String name;
     private List<Date> availabilities;
     private List<String> qualifications;
     private String experience;
-    private List<String> canTeach; // Assuming Subject is a class you have defined elsewhere
+    private List<String> canTeach;
     private List<TrainingSession> trainingSessions;
+
+    // Short Constructor
+    public Teacher(String name, String experience) {
+        this.id = ++highestID;
+        this.name = name;
+        this.availabilities = new ArrayList<>();
+        this.qualifications = new ArrayList<>();
+        this.experience = experience;
+        this.canTeach = new ArrayList<>();
+        this.trainingSessions = new ArrayList<>();
+    }
 
     // Constructor
     public Teacher(int id, String name, List<Date> availabilities, List<String> qualifications, String experience, List<String> canTeach, List<TrainingSession> trainingSessions) {
         this.id = id;
+        if (id > this.highestID) {
+            this.highestID = id;
+        }
         this.name = name;
         this.availabilities = availabilities;
         this.qualifications = qualifications;
@@ -24,6 +43,7 @@ public class Teacher implements Serializable {
     }
 
     // Getters and Setters
+
     public int getId() {
         return id;
     }

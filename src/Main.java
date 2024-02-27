@@ -1,25 +1,29 @@
+import DAO.GenericDAO;
+import interfaces.Identifiable;
+import model.Teacher;
+
 import java.util.ArrayList;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
         // Create a new DAO
-        DAO dao = new DAO();
-        // Create a new Teacher
+        GenericDAO<Teacher> teacherDAO = new GenericDAO<>("data/teachers.ser");
+        // Create a new model.Teacher
         Teacher teacher = new Teacher(1, "John Doe", new ArrayList<>(), new ArrayList<>(), "5 years", new ArrayList<>(), new ArrayList<>());
         // Add the teacher to the DAO
-        dao.addTeacher(teacher);
+        teacherDAO.addEntity(teacher);
         // Create another teacher
         Teacher teacher2 = new Teacher(2, "Jane Smith", new ArrayList<>(), new ArrayList<>(), "10 years", new ArrayList<>(), new ArrayList<>());
         // Add the teacher to the DAO
-        dao.addTeacher(teacher2);
+        teacherDAO.addEntity(teacher2);
         // Update the first teacher
         teacher.setExperience("10 years");
-        dao.updateTeacher(teacher);
+        teacherDAO.updateEntity(teacher);
         // Get all teachers from the DAO
-        Map<Integer, Teacher> teachers = dao.getAllTeachers();
+        Map<Integer, Teacher> teachers = teacherDAO.getAllEntities();
         // Print all teachers
-        for (Teacher t : teachers.values()) {
+        for (Identifiable t : teachers.values()) {
             System.out.println(t);
         }
     }
