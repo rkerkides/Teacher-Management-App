@@ -4,7 +4,7 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         // Create a new DAO
-        DAO dao = new DAO();
+        DAO dao = DAO.getInstance();
         // Create a new Teacher
         Teacher teacher = new Teacher(1, "John Doe", new ArrayList<>(), new ArrayList<>(), "5 years", new ArrayList<>(), new ArrayList<>());
         // Add the teacher to the DAO

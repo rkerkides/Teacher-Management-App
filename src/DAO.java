@@ -3,14 +3,23 @@ import java.util.Map;
 import java.io.*;
 
 public class DAO implements TeacherDAO {
+    // Singleton instance
+    private static DAO instance;
     private Map<Integer, Teacher> teachers = new HashMap<>();
     private static final String FILE_PATH = "teachers.ser";
 
-    // Constructor to load teachers from file
-    public DAO() {
+    // Private constructor
+    private DAO() {
         loadTeachers();
     }
 
+    // Public method to get instance
+    public static DAO getInstance() {
+        if (instance == null) {
+            instance = new DAO();
+        }
+        return instance;
+    }
     public Map<Integer, Teacher> getAllTeachers() {
         return teachers;
     }
