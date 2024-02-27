@@ -11,8 +11,8 @@ public interface TeacherDAO {
     Map<Integer,Teacher> getAllTeachers();
     void addTeacher(Teacher teacher);
 
-    void removeTeacher(int id);
+    void removeTeacher(Teacher teacher);
 
-    void updateTeacher(int id);
+    void updateTeacher(Teacher teacher);
     Teacher getTeacher(int id);
 }

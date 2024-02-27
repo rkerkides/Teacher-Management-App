@@ -1,17 +1,19 @@
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Teacher {
+public class Teacher implements Serializable {
+    private static final long serialVersionUID = 1L; // ensures class version compatibility
     private int id;
     private String name;
     private List<Date> availabilities;
     private List<String> qualifications;
     private String experience;
-    private List<Subject> canTeach; // Assuming Subject is a class you have defined elsewhere
+    private List<String> canTeach; // Assuming Subject is a class you have defined elsewhere
     private List<TrainingSession> trainingSessions;
 
     // Constructor
-    public Teacher(int id, String name, List<Date> availabilities, List<String> qualifications, String experience, List<Subject> canTeach, List<TrainingSession> trainingSessions) {
+    public Teacher(int id, String name, List<Date> availabilities, List<String> qualifications, String experience, List<String> canTeach, List<TrainingSession> trainingSessions) {
         this.id = id;
         this.name = name;
         this.availabilities = availabilities;
@@ -62,11 +64,11 @@ public class Teacher {
         this.experience = experience;
     }
 
-    public List<Subject> getCanTeach() {
+    public List<String> getCanTeach() {
         return canTeach;
     }
 
-    public void setCanTeach(List<Subject> canTeach) {
+    public void setCanTeach(List<String> canTeach) {
         this.canTeach = canTeach;
     }
 
@@ -76,5 +78,18 @@ public class Teacher {
 
     public void setTrainingSessions(List<TrainingSession> trainingSessions) {
         this.trainingSessions = trainingSessions;
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", availabilities=" + availabilities +
+                ", qualifications=" + qualifications +
+                ", experience='" + experience + '\'' +
+                ", canTeach=" + canTeach +
+                ", trainingSessions=" + trainingSessions +
+                '}';
     }
 }
