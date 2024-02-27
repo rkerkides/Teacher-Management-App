@@ -1,5 +1,7 @@
+import java.io.Serializable;
 import java.util.Date;
-public class TrainingSession {
+public class TrainingSession implements Serializable {
+    private static final long serialVersionUID = 1L; // ensures class version compatibility
     private int id;
     private Date date;
     private Teacher teacher;
