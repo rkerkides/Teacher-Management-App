@@ -12,13 +12,15 @@ import java.util.Scanner;
 public class UserInterface {
 // Private static variable to store the singleton of the class
     private static UserInterface instance;
-    private Scanner scanner;
-    private GenericDAO<TeachingRequirement> teachingRequirementDAO;
+    private final Scanner scanner;
+    private final GenericDAO<TeachingRequirement> teachingRequirementDAO;
+    private final GenericDAO<Teacher> teacherDAO;
 
     // Private constructor to prevent instantiation from outside the class
     private UserInterface() {
         this.scanner = new Scanner(System.in);
         this.teachingRequirementDAO = new GenericDAO<>("data/teachingRequirements.ser");
+        this.teacherDAO = new GenericDAO<>("data/teachers.ser");
     }
 
     // Public static method to get the single instance of the class
@@ -87,6 +89,103 @@ public class UserInterface {
             }
         }
         return date;
+    }
+
+    // Public method to display the main menu
+    public void displayMainMenu() {
+        boolean exit = false;
+
+        while (!exit) {
+            showMessage("\nWelcome to the Part-Time Teachers Management System.\n");
+            showMessage("Please select an option:");
+            showMessage("1. Input Teaching Requirements (Class Director)");
+            showMessage("2. View Teaching Requirements (Administrator)");
+            showMessage("3. Maintain Teacher Database (Administrator)");
+            showMessage("4. Match Teachers with Requirements (Administrator)");
+            showMessage("5. Schedule Training for Teachers (Administrator)");
+            showMessage("6. Exit and Save Data");
+
+            int choice = getIntInput("");
+            switch (choice) {
+                case 1:
+                    inputTeachingRequirements();
+                    break;
+                case 2:
+                    displayTeachingRequirements();
+                    break;
+                case 3:
+                    maintainTeacherDatabase();
+                    break;
+                case 4:
+                    matchTeachersWithRequirements();
+                    break;
+                case 5:
+                    scheduleTrainingForTeachers();
+                    break;
+                case 6:
+                    showMessage("Exiting and saving all data...");
+                    saveData();
+                    exit = true;
+                    break;
+                default:
+                    showMessage("Invalid option, please try again.");
+                    break;
+            }
+        }
+    }
+
+    private void inputTeachingRequirements() {
+        Scanner scanner = new Scanner(System.in);
+
+        String subject = getInput("Enter required subject: ");
+
+        String qualification = getInput("Enter required qualification: ");
+
+        String experience = getInput("Enter required experience: ");
+    }
+
+
+    private void viewTeachingRequirements() {
+        // Implement functionality to view teaching requirements
+    }
+
+    private void maintainTeacherDatabase() {
+        System.out.println("Choose an option:");
+        System.out.println("1. Add Teacher");
+        System.out.println("2. Update Teacher");
+        System.out.println("3. Remove Teacher");
+        System.out.println("4. View All Teachers");
+        int choice = getIntInput("");
+        scanner.nextLine(); // consume newline
+
+        switch (choice) {
+            case 1:
+                // Here you would call a method to add a teacher, similar to the provided maintainTeacherDatabase example
+                // addTeacher(scanner, teacherDao);
+                break;
+            case 2:
+                // Similarly, for updating a teacher
+                // updateTeacher(scanner, teacherDao);
+                break;
+            case 3:
+                // And for removing a teacher
+                // removeTeacher(scanner, teacherDao);
+                break;
+            case 4:
+                // For viewing all teachers
+                teacherDAO.getAllEntities().values().forEach(System.out::println);
+                break;
+            default:
+                System.out.println("Invalid option.");
+                break;
+        }
+    }
+    private void matchTeachersWithRequirements() {
+    }
+    private void scheduleTrainingForTeachers() {
+    }
+
+    private void saveData() {
     }
 
     public Teacher inputTeacher() {

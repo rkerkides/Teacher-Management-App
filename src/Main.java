@@ -1,13 +1,13 @@
 import DAO.GenericDAO;
 import interfaces.Identifiable;
 import model.Teacher;
-
+import view.UserInterface;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        // Create a new DAO
+        /*// Create a new DAO
         GenericDAO<Teacher> teacherDAO = new GenericDAO<>("data/teachers.ser");
         // Create a new model.Teacher
         Teacher teacher = new Teacher(1, "John Doe", new ArrayList<>(), new ArrayList<>(), "5 years", new ArrayList<>(), new ArrayList<>());
@@ -25,6 +25,8 @@ public class Main {
         // Print all teachers
         for (Identifiable t : teachers.values()) {
             System.out.println(t);
-        }
+        }*/
+        UserInterface ui = UserInterface.getInstance();
+        ui.displayMainMenu();
     }
 }
