@@ -2,7 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.Date;
-public class TrainingSession implements Serializable {
+public class TrainingSession implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private int id;
     private Date date;

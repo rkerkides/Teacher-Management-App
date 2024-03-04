@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import interfaces.Identifiable;
 
 public class Teacher implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility

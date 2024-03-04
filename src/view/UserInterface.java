@@ -1,34 +1,46 @@
 package view;
 
-import DAO.GenericDAO;
+import service.TeacherService;
+import service.TeachingRequirementService;
 import model.Teacher;
 import model.TeachingRequirement;
+import service.TrainingSessionService;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserInterface {
-// Private static variable to store the singleton of the class
     private static UserInterface instance;
     private final Scanner scanner;
-    private final GenericDAO<TeachingRequirement> teachingRequirementDAO;
-    private final GenericDAO<Teacher> teacherDAO;
+    private TeacherService teacherService;
+    private TeachingRequirementService teachingRequirementService;
+    private TrainingSessionService trainingSessionService;
 
-    // Private constructor to prevent instantiation from outside the class
     private UserInterface() {
-        this.scanner = new Scanner(System.in);
-        this.teachingRequirementDAO = new GenericDAO<>("data/teachingRequirements.ser");
-        this.teacherDAO = new GenericDAO<>("data/teachers.ser");
+        scanner = new Scanner(System.in);
     }
 
-    // Public static method to get the single instance of the class
     public static UserInterface getInstance() {
         if (instance == null) {
             instance = new UserInterface();
         }
         return instance;
+    }
+
+    // Setter methods for service dependencies
+    public void setTeacherService(TeacherService teacherService) {
+        this.teacherService = teacherService;
+    }
+
+    public void setTeachingRequirementService(TeachingRequirementService teachingRequirementService) {
+        this.teachingRequirementService = teachingRequirementService;
+    }
+
+    public void setTrainingSessionService(TrainingSessionService trainingSessionService) {
+        this.trainingSessionService = trainingSessionService;
     }
 
     public String getInput(String prompt) {
@@ -103,28 +115,27 @@ public class UserInterface {
             showMessage("3. Maintain Teacher Database (Administrator)");
             showMessage("4. Match Teachers with Requirements (Administrator)");
             showMessage("5. Schedule Training for Teachers (Administrator)");
-            showMessage("6. Exit and Save Data");
+            showMessage("6. Exit");
 
             int choice = getIntInput("");
             switch (choice) {
                 case 1:
-                    inputTeachingRequirements();
+                    // Implement feature using teachingRequirementService
                     break;
                 case 2:
-                    displayTeachingRequirements();
+                    displayAllTeachingRequirements();
                     break;
                 case 3:
                     maintainTeacherDatabase();
                     break;
                 case 4:
-                    matchTeachersWithRequirements();
+                    // Implement feature using teachingRequirementService and teacherService
                     break;
                 case 5:
-                    scheduleTrainingForTeachers();
+                    // Implement feature using trainingSessionService
                     break;
                 case 6:
-                    showMessage("Exiting and saving all data...");
-                    saveData();
+                    showMessage("Exiting...");
                     exit = true;
                     break;
                 default:
@@ -160,32 +171,27 @@ public class UserInterface {
 
         switch (choice) {
             case 1:
-                // Here you would call a method to add a teacher, similar to the provided maintainTeacherDatabase example
-                // addTeacher(scanner, teacherDao);
+                addTeacher();
                 break;
             case 2:
-                // Similarly, for updating a teacher
-                // updateTeacher(scanner, teacherDao);
+                // Logic for updating a teacher
                 break;
             case 3:
-                // And for removing a teacher
-                // removeTeacher(scanner, teacherDao);
+                // Logic for removing a teacher
                 break;
             case 4:
-                // For viewing all teachers
-                teacherDAO.getAllEntities().values().forEach(System.out::println);
+                viewAllTeachers();
                 break;
             default:
                 System.out.println("Invalid option.");
                 break;
         }
     }
+
     private void matchTeachersWithRequirements() {
     }
-    private void scheduleTrainingForTeachers() {
-    }
 
-    private void saveData() {
+    private void scheduleTrainingForTeachers() {
     }
 
     public Teacher inputTeacher() {
@@ -216,12 +222,23 @@ public class UserInterface {
         return teacher;
     }
 
-    public void displayTeachingRequirements(){
-        // Read the teaching requirements from the file
-        // Display the teaching requirements
-        Map<Integer, TeachingRequirement> teachingRequirements = teachingRequirementDAO.getAllEntities();
-        for (TeachingRequirement requirement : teachingRequirements.values()) {
-            System.out.println(requirement);
-        }
+    private void addTeacher() {
+        // Simplified example
+        System.out.println("Enter teacher's name:");
+        String name = scanner.nextLine();
+        System.out.println("Enter teacher's experience:");
+        String experience = scanner.nextLine();
+        Teacher newTeacher = new Teacher(name, experience); // Assuming a constructor exists
+        teacherService.addTeacher(newTeacher);
+    }
+
+    private void viewAllTeachers() {
+        List<Teacher> teachers = teacherService.getAllTeachers();
+        teachers.forEach(teacher -> System.out.println(teacher.toString()));
+    }
+
+    private void displayAllTeachingRequirements() {
+        List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
+        requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
 }

@@ -1,9 +1,11 @@
-import DAO.GenericDAO;
-import interfaces.Identifiable;
+import dao.FileGenericDAO;
 import model.Teacher;
+import model.TeachingRequirement;
+import model.TrainingSession;
+import service.TeacherService;
+import service.TeachingRequirementService;
+import service.TrainingSessionService;
 import view.UserInterface;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,7 +28,23 @@ public class Main {
         for (Identifiable t : teachers.values()) {
             System.out.println(t);
         }*/
+
+
+        // Instantiate DAOs
+        FileGenericDAO<Teacher> teacherDAO = new FileGenericDAO<>("data/teachers.ser");
+        FileGenericDAO<TeachingRequirement> teachingRequirementDAO = new FileGenericDAO<>("data/teachingRequirements.ser");
+        FileGenericDAO<TrainingSession> trainingSessionDAO = new FileGenericDAO<>("data/trainingSessions.ser");
+
+        // Instantiate services with the DAOs
+        TeacherService teacherService = new TeacherService(teacherDAO);
+        TeachingRequirementService teachingRequirementService = new TeachingRequirementService(teachingRequirementDAO);
+        TrainingSessionService trainingSessionService = new TrainingSessionService(trainingSessionDAO);
+
+        // Instantiate the UI with the services
         UserInterface ui = UserInterface.getInstance();
+        ui.setTeacherService(teacherService);
+        ui.setTeachingRequirementService(teachingRequirementService);
+        ui.setTrainingSessionService(trainingSessionService);
         ui.displayMainMenu();
     }
 }
