@@ -1,5 +1,6 @@
 package view;
 
+import model.TrainingSession;
 import service.TeacherService;
 import service.TeachingRequirementService;
 import model.Teacher;
@@ -8,6 +9,7 @@ import service.TrainingSessionService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -54,7 +56,9 @@ public class UserInterface {
             scanner.next(); // Read and discard unwanted input
             System.out.println("Invalid input. Please enter an integer.");
         }
-        return scanner.nextInt();
+        int input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline left-over
+        return input;
     }
 
     public double getDoubleInput(String prompt) {
@@ -145,21 +149,6 @@ public class UserInterface {
         }
     }
 
-    private void inputTeachingRequirements() {
-        Scanner scanner = new Scanner(System.in);
-
-        String subject = getInput("Enter required subject: ");
-
-        String qualification = getInput("Enter required qualification: ");
-
-        String experience = getInput("Enter required experience: ");
-    }
-
-
-    private void viewTeachingRequirements() {
-        // Implement functionality to view teaching requirements
-    }
-
     private void maintainTeacherDatabase() {
         System.out.println("Choose an option:");
         System.out.println("1. Add Teacher");
@@ -167,7 +156,6 @@ public class UserInterface {
         System.out.println("3. Remove Teacher");
         System.out.println("4. View All Teachers");
         int choice = getIntInput("");
-        scanner.nextLine(); // consume newline
 
         switch (choice) {
             case 1:
@@ -188,48 +176,46 @@ public class UserInterface {
         }
     }
 
-    private void matchTeachersWithRequirements() {
-    }
-
-    private void scheduleTrainingForTeachers() {
+    private void addTeacher() {
+        // Similar to the inputTeacher() method, but directly adds the teacher to the service
+        Teacher newTeacher = inputTeacher();
+        teacherService.addTeacher(newTeacher);
+        System.out.println("Teacher added successfully!");
     }
 
     public Teacher inputTeacher() {
         String name = getInput("Enter the teacher's name:");
         String experience = getInput("Enter the teacher's experience:");
-        Teacher teacher = new Teacher(name, experience);
+        List<Date> availabilities = new ArrayList<>();
+        List<String> qualifications = new ArrayList<>();
+        List<String> canTeach = new ArrayList<>();
+        List<TrainingSession> trainingSessions = new ArrayList<>();
 
-        String decision = getInput("Would you like to add qualifications? (yes/no)");
-        while (decision.equals("yes")) {
-            String qualification = getInput("Enter a qualification:");
-            // Add the qualification to the teacher
-            teacher.getQualifications().add(qualification);
-            decision = getInput("Would you like to add another qualification? (yes/no)");
+        // Add qualifications
+        if (getYesNoInput("Would you like to add qualifications?")) {
+            do {
+                String qualification = getInput("Enter a qualification:");
+                qualifications.add(qualification);
+            } while (getYesNoInput("Would you like to add another qualification?"));
         }
-        decision = getInput("Would you like to add availabilities? (yes/no)");
-        while (decision.equals("yes")) {
-            // Add the availability to the teacher
-            teacher.getAvailabilities().add(inputDate());
-            decision = getInput("Would you like to add another availability? (yes/no)");
-        }
-        decision = getInput("Would you like to add subjects the teacher can teach? (yes/no)");
-        while (decision.equals("yes")) {
-            String subject = getInput("Enter a subject:");
-            // Add the subject to the teacher
-            teacher.getCanTeach().add(subject);
-            decision = getInput("Would you like to add another subject? (yes/no)");
-        }
-        return teacher;
-    }
 
-    private void addTeacher() {
-        // Simplified example
-        System.out.println("Enter teacher's name:");
-        String name = scanner.nextLine();
-        System.out.println("Enter teacher's experience:");
-        String experience = scanner.nextLine();
-        Teacher newTeacher = new Teacher(name, experience); // Assuming a constructor exists
-        teacherService.addTeacher(newTeacher);
+        // Add availabilities
+        if (getYesNoInput("Would you like to add availabilities?")) {
+            do {
+                availabilities.add(inputDate());
+            } while (getYesNoInput("Would you like to add another availability?"));
+        }
+
+        // Add subjects the teacher can teach
+        if (getYesNoInput("Would you like to add subjects the teacher can teach?")) {
+            do {
+                String subject = getInput("Enter a subject:");
+                canTeach.add(subject);
+            } while (getYesNoInput("Would you like to add another subject?"));
+        }
+
+        // Note: Adding TrainingSessions to the teacher would require additional logic
+        return new Teacher(name, availabilities, qualifications, experience, canTeach, trainingSessions);
     }
 
     private void viewAllTeachers() {
@@ -241,4 +227,6 @@ public class UserInterface {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
+
+    // Other methods like inputTeachingRequirements(), viewTeachingRequirements(), matchTeachersWithRequirements(), scheduleTrainingForTeachers() would be implemented here.
 }
