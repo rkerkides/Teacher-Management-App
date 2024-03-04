@@ -1,18 +1,20 @@
 package model;
 
+import util.IdGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 public class TrainingSession implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
-    private int id;
+    private final int id;
     private Date date;
     private Teacher teacher;
     private String subject;
     private String course;
 
     // Constructor
-    public TrainingSession(int id, Date date, Teacher teacher, String subject, String course) {
-        this.id = id;
+    public TrainingSession(Date date, Teacher teacher, String subject, String course) {
+        this.id = IdGenerator.generateTrainingSessionId();
         this.date = date;
         this.teacher = teacher;
         this.subject = subject;
@@ -22,10 +24,6 @@ public class TrainingSession implements Serializable, Identifiable {
     // Getters and Setters
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Date getDate() {
