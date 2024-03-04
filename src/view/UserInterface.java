@@ -237,7 +237,7 @@ public class UserInterface {
         teachers.forEach(teacher -> System.out.println(teacher.toString()));
     }
 
-    private void displayAllTeachingRequirements() {
+    public void displayAllTeachingRequirements() {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }

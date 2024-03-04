@@ -25,6 +25,6 @@ public class Administrator implements Serializable {
     }
 
     public void displayAllTeachingRequirements() {
-        ui.displayTeachingRequirements();
+        ui.displayAllTeachingRequirements();
     }
 }

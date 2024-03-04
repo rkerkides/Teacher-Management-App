@@ -8,7 +8,7 @@ import java.util.List;
 public class Teacher implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private int id;
-    private int highestID;
+    private static int highestID;
     private String name;
     private List<Date> availabilities;
     private List<String> qualifications;
@@ -30,8 +30,8 @@ public class Teacher implements Serializable, Identifiable {
     // Constructor
     public Teacher(int id, String name, List<Date> availabilities, List<String> qualifications, String experience, List<String> canTeach, List<TrainingSession> trainingSessions) {
         this.id = id;
-        if (id > this.highestID) {
-            this.highestID = id;
+        if (id > highestID) {
+            highestID = id;
         }
         this.name = name;
         this.availabilities = availabilities;
