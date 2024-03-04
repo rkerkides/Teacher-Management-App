@@ -125,15 +125,19 @@ public class UserInterface {
                     break;
                 case 2:
                     displayAllTeachingRequirements();
+                    pauseBeforeContinuing();
                     break;
                 case 3:
                     maintainTeacherDatabase();
+                    pauseBeforeContinuing();
                     break;
                 case 4:
                     // Implement feature using teachingRequirementService and teacherService
+                    pauseBeforeContinuing();
                     break;
                 case 5:
                     // Implement feature using trainingSessionService
+                    pauseBeforeContinuing();
                     break;
                 case 6:
                     showMessage("Exiting...");
@@ -145,6 +149,13 @@ public class UserInterface {
             }
         }
     }
+
+    // Helper method for making a smoother transition back to the main menu after completing a task
+    private void pauseBeforeContinuing() {
+        showMessage("\nPress Enter to return to the main menu...");
+        scanner.nextLine();
+    }
+
 
     private void maintainTeacherDatabase() {
         System.out.println("Choose an option:");
@@ -290,7 +301,7 @@ public class UserInterface {
 
     private void viewAllTeachers() {
         List<Teacher> teachers = teacherService.getAllTeachers();
-        teachers.forEach(teacher -> System.out.println(teacher.toString()));
+        teachers.forEach(teacher -> System.out.println(teacher.toString() + "\n"));
     }
 
     public void displayAllTeachingRequirements() {
