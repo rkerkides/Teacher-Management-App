@@ -31,9 +31,9 @@ public class Main {
 
 
         // Instantiate DAOs
-        FileGenericDAO<Teacher> teacherDAO = new FileGenericDAO<>("data/teachers.ser");
-        FileGenericDAO<TeachingRequirement> teachingRequirementDAO = new FileGenericDAO<>("data/teachingRequirements.ser");
-        FileGenericDAO<TrainingSession> trainingSessionDAO = new FileGenericDAO<>("data/trainingSessions.ser");
+        FileGenericDAO<Teacher> teacherDAO = new FileGenericDAO<>("data/teachers.ser", Teacher.class);
+        FileGenericDAO<TeachingRequirement> teachingRequirementDAO = new FileGenericDAO<>("data/teachingRequirements.ser", TeachingRequirement.class);
+        FileGenericDAO<TrainingSession> trainingSessionDAO = new FileGenericDAO<>("data/trainingSessions.ser", TrainingSession.class);
 
         // Instantiate services with the DAOs
         TeacherService teacherService = new TeacherService(teacherDAO);

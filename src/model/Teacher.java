@@ -41,6 +41,10 @@ public class Teacher implements Serializable, Identifiable {
         this.trainingSessions = trainingSessions;
     }
 
+    public static void updateHighestId(int highestId) {
+        Teacher.highestID = highestId;
+    }
+
     // Getters and Setters
 
     public int getId() {

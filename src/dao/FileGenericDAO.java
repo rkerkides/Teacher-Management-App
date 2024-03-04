@@ -2,17 +2,20 @@ package dao;
 
 import model.Identifiable;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 // FileGenericDAO implements the GenericDAO interface using file storage
 public class FileGenericDAO<T extends Identifiable> implements GenericDAO<T> {
     private Map<Integer, T> entities = new HashMap<>();
     private final String filePath;
+    private final Class<T> entityType; // Added to use reflection for calling updateHighestId
 
-    // Constructor initializes the DAO with a specific file path for storage
-    public FileGenericDAO(String filePath) {
+    public FileGenericDAO(String filePath, Class<T> entityType) {
         this.filePath = filePath;
-        loadEntities(); // Load existing entities from file at initialization
+        this.entityType = entityType;
+        loadEntities();
     }
 
     @Override
@@ -64,9 +67,25 @@ public class FileGenericDAO<T extends Identifiable> implements GenericDAO<T> {
         if (file.exists()) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
                 entities = (Map<Integer, T>) ois.readObject();
+                // Update highestID based on loaded entities
+                if (!entities.isEmpty()) {
+                    int maxId = Collections.max(entities.keySet());
+                    // Assuming entities like Teacher have a static method to update highestID
+                    updateEntityHighestId(maxId);
+                }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    // Reflectively call the static method to update highestID on the entity class
+    private void updateEntityHighestId(int highestId) {
+        try {
+            Method updateHighestIdMethod = entityType.getMethod("updateHighestId", int.class);
+            updateHighestIdMethod.invoke(null, highestId); // null for static methods
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 }
