@@ -1,13 +1,20 @@
 package model;
 
+import util.IdGenerator;
+
 import java.io.Serializable;
-import interfaces.Identifiable;
 
 public class TeachingRequirement implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
-    int id;
+    private final int id;
     String subject;
     String[] qualificationsRequired;
+
+    public TeachingRequirement(String subject, String[] qualificationsRequired) {
+        this.id = IdGenerator.generateTeachingRequirementId();
+        this.subject = subject;
+        this.qualificationsRequired = qualificationsRequired;
+    }
 
     @Override
     public int getId() {

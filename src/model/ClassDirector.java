@@ -1,19 +1,24 @@
 package model;
 
+import service.TeachingRequirementService;
 import java.io.Serializable;
-import java.util.List;
 
 public class ClassDirector implements Serializable {
-    List<TeachingRequirement> requirements;
+    private static final long serialVersionUID = 1L; // ensures class version compatibility
+    private transient TeachingRequirementService teachingRequirementService;
 
-    public List<TeachingRequirement> viewTeachingRequirements(){
-        // Alternative implementation would involve a void method that prints the requirements to the console
-        return requirements;
+    // Constructor injection is preferred for setting the TeachingRequirementService dependency
+    public ClassDirector(TeachingRequirementService teachingRequirementService) {
+        this.teachingRequirementService = teachingRequirementService;
     }
 
-    public void inputTeachingRequirement(TeachingRequirement requirement){
-        // Add requirement to list
-        requirements.add(requirement);
+    public void viewTeachingRequirements() {
+        // Now this method uses the TeachingRequirementService to get and display requirements
+        teachingRequirementService.getAllTeachingRequirements().forEach(System.out::println);
+    }
+
+    public void inputTeachingRequirement(TeachingRequirement requirement) {
+        // This method now delegates the addition of a new TeachingRequirement to the service
+        teachingRequirementService.addTeachingRequirement(requirement);
     }
 }
-
