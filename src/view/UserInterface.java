@@ -17,8 +17,6 @@ public class UserInterface {
     private TeacherService teacherService;
     private TeachingRequirementService teachingRequirementService;
     private TrainingSessionService trainingSessionService;
-	private TeachingRequirement teachingRequirement; 
-
 
     private UserInterface() {
         scanner = new Scanner(System.in);
@@ -82,6 +80,19 @@ public class UserInterface {
             }
         }
     }
+    
+    public Date getDateInput(String prompt) {
+        System.out.println(prompt + " (YYYY-MM-DD)");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        while (true) {
+            String input = scanner.nextLine().trim();
+            try {
+                return formatter.parse(input);
+            } catch (ParseException e) {
+                System.out.println("Invalid input. Please enter a date in the format YYYY-MM-DD.");
+            }
+        }
+    }
 
     public void showMessage(String message) {
         System.out.println(message);
@@ -123,9 +134,8 @@ public class UserInterface {
             int choice = getIntInput("");
             switch (choice) {
                 case 1:
-                    inputTeachingRequirements();
-                	exit = true;
-                	break;
+                    // Implement feature using teachingRequirementService
+                    break;
                 case 2:
                     displayAllTeachingRequirements();
                     pauseBeforeContinuing();
@@ -139,7 +149,7 @@ public class UserInterface {
                     pauseBeforeContinuing();
                     break;
                 case 5:
-                    // Implement feature using trainingSessionService
+                	scheduleTrainingForTeachers();
                     pauseBeforeContinuing();
                     break;
                 case 6:
@@ -311,38 +321,42 @@ public class UserInterface {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
+    
+    // case 5 logic @Bariscan
+    public void scheduleTrainingForTeachers() {
+        List<Teacher> teachers = teacherService.getAllTeachers();
+        teachers.forEach(System.out::println); 
+
+        int teacherId = getIntInput("Enter ID of Teacher to schedule training for:");
+        
+        Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
+        if (!optionalTeacher.isPresent()) {
+            System.out.println("Teacher not found.");
+            return; 
+        }
+        Teacher selectedTeacher = optionalTeacher.get();
+
+        System.out.println(selectedTeacher.displayAvailabilities());
+
+        Date date = getDateInput("Enter date to schedule training for (YYYY-MM-DD):");
+        
+        if (!selectedTeacher.getAvailabilities().contains(date)) {
+            System.out.println("Date not available for this teacher.");
+            return; 
+        }
+
+        selectedTeacher.getAvailabilities().remove(date);
+
+        String subject = getInput("Enter subject to schedule training for:");
+        String course = getInput("Enter course to schedule training for:");
+
+        TrainingSession newSession = new TrainingSession(date, selectedTeacher, subject, course);
+        trainingSessionService.addTrainingSession(newSession);
+
+        System.out.println("Training Session Scheduled:");
+        System.out.println(newSession.toString());
+    }
+
 
     // Other methods like inputTeachingRequirements(), viewTeachingRequirements(), matchTeachersWithRequirements(), scheduleTrainingForTeachers() would be implemented here.
-	
-	  // @abs
-    private void inputTeachingRequirements() {
-        Scanner scanner = new Scanner(System.in);
-
-        String[] prompts = {"Enter required subject: ", "Enter required qualification: ", "Enter required experience: "};
-        String[] inputs = new String[3];
-
-        // Get inputs
-        for (int i = 0; i < prompts.length; i++) {
-            inputs[i] = getInput(prompts[i]);
-        }
-        
-        // Initialize TeachingRequirement object and add to teachingRequirementService
-        teachingRequirement = new TeachingRequirement(inputs[0], new String[]{inputs[1], inputs[2]});
-        teachingRequirementService.addTeachingRequirement(teachingRequirement);
-    }
-
-	// @ Abs
-	private void viewTeachingRequirements() {
-    System.out.println("The following are our Teaching Requirements:");
-    List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
-    Iterator<TeachingRequirement> iterator = requirements.iterator();
-    
-    while (iterator.hasNext()) {
-        TeachingRequirement requirement = iterator.next();
-        System.out.println(requirement.toString());
-    }
-	
-	
-}
-
 }
