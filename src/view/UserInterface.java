@@ -17,6 +17,8 @@ public class UserInterface {
     private TeacherService teacherService;
     private TeachingRequirementService teachingRequirementService;
     private TrainingSessionService trainingSessionService;
+	private TeachingRequirement teachingRequirement; 
+
 
     private UserInterface() {
         scanner = new Scanner(System.in);
@@ -121,8 +123,9 @@ public class UserInterface {
             int choice = getIntInput("");
             switch (choice) {
                 case 1:
-                    // Implement feature using teachingRequirementService
-                    break;
+                    inputTeachingRequirements();
+                	exit = true;
+                	break;
                 case 2:
                     displayAllTeachingRequirements();
                     pauseBeforeContinuing();
@@ -310,4 +313,36 @@ public class UserInterface {
     }
 
     // Other methods like inputTeachingRequirements(), viewTeachingRequirements(), matchTeachersWithRequirements(), scheduleTrainingForTeachers() would be implemented here.
+	
+	  // @abs
+    private void inputTeachingRequirements() {
+        Scanner scanner = new Scanner(System.in);
+
+        String[] prompts = {"Enter required subject: ", "Enter required qualification: ", "Enter required experience: "};
+        String[] inputs = new String[3];
+
+        // Get inputs
+        for (int i = 0; i < prompts.length; i++) {
+            inputs[i] = getInput(prompts[i]);
+        }
+        
+        // Initialize TeachingRequirement object and add to teachingRequirementService
+        teachingRequirement = new TeachingRequirement(inputs[0], new String[]{inputs[1], inputs[2]});
+        teachingRequirementService.addTeachingRequirement(teachingRequirement);
+    }
+
+	// @ Abs
+	private void viewTeachingRequirements() {
+    System.out.println("The following are our Teaching Requirements:");
+    List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
+    Iterator<TeachingRequirement> iterator = requirements.iterator();
+    
+    while (iterator.hasNext()) {
+        TeachingRequirement requirement = iterator.next();
+        System.out.println(requirement.toString());
+    }
+	
+	
+}
+
 }
