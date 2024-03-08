@@ -3,9 +3,11 @@ package model;
 import util.IdGenerator;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Teacher implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L; // ensures class version compatibility
@@ -96,14 +98,24 @@ public class Teacher implements Serializable, Identifiable {
 
     @Override
     public String toString() {
-        return "Teacher{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", availabilities=" + availabilities +
-                ", qualifications=" + qualifications +
-                ", experience='" + experience + '\'' +
-                ", canTeach=" + canTeach +
-                ", trainingSessions=" + trainingSessions +
-                '}';
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String availabilitiesFormatted = availabilities.stream()
+                .map(dateFormat::format)
+                .collect(Collectors.joining(", "));
+
+        String qualificationsFormatted = String.join(", ", qualifications);
+        String canTeachFormatted = String.join(", ", canTeach);
+        String trainingSessionsFormatted = trainingSessions.stream()
+                .map(TrainingSession::toString) // Assuming TrainingSession has a meaningful toString implementation
+                .collect(Collectors.joining("; "));
+
+        return "Teacher Information:\n" +
+                "  Name: " + name + "\n" +
+                "  ID: " + id + "\n" +
+                "  Experience: " + experience + "\n" +
+                "  Availabilities: [" + availabilitiesFormatted + "]\n" +
+                "  Qualifications: [" + qualificationsFormatted + "]\n" +
+                "  Can Teach: [" + canTeachFormatted + "]\n" +
+                "  Training Sessions: [" + trainingSessionsFormatted + "]";
     }
 }

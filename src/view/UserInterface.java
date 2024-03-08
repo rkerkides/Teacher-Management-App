@@ -1,5 +1,6 @@
 package view;
 
+import model.TrainingSession;
 import service.TeacherService;
 import service.TeachingRequirementService;
 import model.Teacher;
@@ -8,11 +9,7 @@ import service.TrainingSessionService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class UserInterface {
     private static UserInterface instance;
@@ -20,6 +17,8 @@ public class UserInterface {
     private TeacherService teacherService;
     private TeachingRequirementService teachingRequirementService;
     private TrainingSessionService trainingSessionService;
+	private TeachingRequirement teachingRequirement; 
+
 
     private UserInterface() {
         scanner = new Scanner(System.in);
@@ -56,7 +55,9 @@ public class UserInterface {
             scanner.next(); // Read and discard unwanted input
             System.out.println("Invalid input. Please enter an integer.");
         }
-        return scanner.nextInt();
+        int input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline left-over
+        return input;
     }
 
     public double getDoubleInput(String prompt) {
@@ -122,19 +123,24 @@ public class UserInterface {
             int choice = getIntInput("");
             switch (choice) {
                 case 1:
-                    // Implement feature using teachingRequirementService
-                    break;
+                    inputTeachingRequirements();
+                	exit = true;
+                	break;
                 case 2:
                     displayAllTeachingRequirements();
+                    pauseBeforeContinuing();
                     break;
                 case 3:
                     maintainTeacherDatabase();
+                    pauseBeforeContinuing();
                     break;
                 case 4:
                 	matchTeachersWithRequirements();
                     break;
                 case 5:
-                	break;
+                    // Implement feature using trainingSessionService
+                    pauseBeforeContinuing();
+                    break;
                 case 6:
                     showMessage("Exiting...");
                     exit = true;
@@ -146,20 +152,12 @@ public class UserInterface {
         }
     }
 
-    private void inputTeachingRequirements() {
-        Scanner scanner = new Scanner(System.in);
-
-        String subject = getInput("Enter required subject: ");
-
-        String qualification = getInput("Enter required qualification: ");
-
-        String experience = getInput("Enter required experience: ");
+    // Helper method for making a smoother transition back to the main menu after completing a task
+    private void pauseBeforeContinuing() {
+        showMessage("\nPress Enter to return to the main menu...");
+        scanner.nextLine();
     }
 
-
-    private void viewTeachingRequirements() {
-        // Implement functionality to view teaching requirements
-    }
 
     private void maintainTeacherDatabase() {
         System.out.println("Choose an option:");
@@ -168,17 +166,16 @@ public class UserInterface {
         System.out.println("3. Remove Teacher");
         System.out.println("4. View All Teachers");
         int choice = getIntInput("");
-        scanner.nextLine(); // consume newline
 
         switch (choice) {
             case 1:
                 addTeacher();
                 break;
             case 2:
-                // Logic for updating a teacher
+                updateTeacher();
                 break;
             case 3:
-                // Logic for removing a teacher
+                removeTeacher();
                 break;
             case 4:
                 viewAllTeachers();
@@ -188,6 +185,7 @@ public class UserInterface {
                 break;
         }
     }
+
 
     private void matchTeachersWithRequirements() {
     	if (teachingRequirementService.getAllTeachingRequirements().isEmpty()) {
@@ -331,53 +329,163 @@ public class UserInterface {
     	
 
     private void scheduleTrainingForTeachers() {
+    	
+    }
+    private void addTeacher() {
+        // Similar to the inputTeacher() method, but directly adds the teacher to the service
+        Teacher newTeacher = inputTeacher();
+        teacherService.addTeacher(newTeacher);
+        System.out.println("Teacher added successfully!");
     }
 
     public Teacher inputTeacher() {
         String name = getInput("Enter the teacher's name:");
         String experience = getInput("Enter the teacher's experience:");
-        Teacher teacher = new Teacher(name, experience);
+        List<Date> availabilities = new ArrayList<>();
+        List<String> qualifications = new ArrayList<>();
+        List<String> canTeach = new ArrayList<>();
+        List<TrainingSession> trainingSessions = new ArrayList<>();
 
-        String decision = getInput("Would you like to add qualifications? (yes/no)");
-        while (decision.equals("yes")) {
-            String qualification = getInput("Enter a qualification:");
-            // Add the qualification to the teacher
-            teacher.getQualifications().add(qualification);
-            decision = getInput("Would you like to add another qualification? (yes/no)");
+        // Add qualifications
+        if (getYesNoInput("Would you like to add qualifications?")) {
+            do {
+                String qualification = getInput("Enter a qualification:");
+                qualifications.add(qualification);
+            } while (getYesNoInput("Would you like to add another qualification?"));
         }
-        decision = getInput("Would you like to add availabilities? (yes/no)");
-        while (decision.equals("yes")) {
-            // Add the availability to the teacher
-            teacher.getAvailabilities().add(inputDate());
-            decision = getInput("Would you like to add another availability? (yes/no)");
+
+        // Add availabilities
+        if (getYesNoInput("Would you like to add availabilities?")) {
+            do {
+                availabilities.add(inputDate());
+            } while (getYesNoInput("Would you like to add another availability?"));
         }
-        decision = getInput("Would you like to add subjects the teacher can teach? (yes/no)");
-        while (decision.equals("yes")) {
-            String subject = getInput("Enter a subject:");
-            // Add the subject to the teacher
-            teacher.getCanTeach().add(subject);
-            decision = getInput("Would you like to add another subject? (yes/no)");
+
+        // Add subjects the teacher can teach
+        if (getYesNoInput("Would you like to add subjects the teacher can teach?")) {
+            do {
+                String subject = getInput("Enter a subject:");
+                canTeach.add(subject);
+            } while (getYesNoInput("Would you like to add another subject?"));
         }
-        return teacher;
+
+        // Note: Adding TrainingSessions to the teacher would require additional logic
+        return new Teacher(name, availabilities, qualifications, experience, canTeach, trainingSessions);
     }
 
-    private void addTeacher() {
-        // Simplified example
-        System.out.println("Enter teacher's name:");
-        String name = scanner.nextLine();
-        System.out.println("Enter teacher's experience:");
-        String experience = scanner.nextLine();
-        Teacher newTeacher = new Teacher(name, experience); // Assuming a constructor exists
-        teacherService.addTeacher(newTeacher);
+    private void updateTeacher() {
+        int teacherId = getIntInput("Enter the ID of the teacher you want to update:");
+        Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
+
+        if (optionalTeacher.isEmpty()) {
+            showMessage("Teacher not found.");
+            return;
+        }
+
+        Teacher teacher = optionalTeacher.get();
+
+        String name = getInput("Enter the teacher's new name (leave blank to keep current):");
+        if (!name.isEmpty()) {
+            teacher.setName(name);
+        }
+
+        String experience = getInput("Enter the teacher's new experience (leave blank to keep current):");
+        if (!experience.isEmpty()) {
+            teacher.setExperience(experience);
+        }
+
+        if (getYesNoInput("Would you like to update the teacher's qualifications?")) {
+            List<String> newQualifications = new ArrayList<>();
+            do {
+                String qualification = getInput("Enter a qualification (leave blank to finish):");
+                if (qualification.isEmpty()) break;
+                newQualifications.add(qualification);
+            } while (true);
+            teacher.setQualifications(newQualifications);
+        }
+
+        if (getYesNoInput("Would you like to update the teacher's availabilities?")) {
+            List<Date> newAvailabilities = new ArrayList<>();
+            do {
+                Date date = inputDate();
+                newAvailabilities.add(date);
+                if (!getYesNoInput("Would you like to add another availability?")) break;
+            } while (true);
+            teacher.setAvailabilities(newAvailabilities);
+        }
+
+        if (getYesNoInput("Would you like to update the subjects the teacher can teach?")) {
+            List<String> newCanTeach = new ArrayList<>();
+            do {
+                String subject = getInput("Enter a subject (leave blank to finish):");
+                if (subject.isEmpty()) break;
+                newCanTeach.add(subject);
+            } while (true);
+            teacher.setCanTeach(newCanTeach);
+        }
+
+        boolean updateResult = teacherService.updateTeacher(teacher);
+        if (updateResult) {
+            showMessage("Teacher updated successfully.");
+        } else {
+            showMessage("Failed to update teacher.");
+        }
+    }
+
+
+    // Removes teachers from the database
+    // Ids are not changed after removal to ensure referential integrity
+    private void removeTeacher() {
+        int teacherId = getIntInput("Enter the ID of the teacher you want to remove:");
+        boolean success = teacherService.removeTeacher(teacherId);
+
+        if (success) {
+            showMessage("Teacher removed successfully.");
+        } else {
+            showMessage("Could not find a teacher with the specified ID.");
+        }
     }
 
     private void viewAllTeachers() {
         List<Teacher> teachers = teacherService.getAllTeachers();
-        teachers.forEach(teacher -> System.out.println(teacher.toString()));
+        teachers.forEach(teacher -> System.out.println(teacher.toString() + "\n"));
     }
 
     public void displayAllTeachingRequirements() {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
+
+    // Other methods like inputTeachingRequirements(), viewTeachingRequirements(), matchTeachersWithRequirements(), scheduleTrainingForTeachers() would be implemented here.
+	
+	  // @abs
+    private void inputTeachingRequirements() {
+        Scanner scanner = new Scanner(System.in);
+
+        String[] prompts = {"Enter required subject: ", "Enter required qualification: ", "Enter required experience: "};
+        String[] inputs = new String[3];
+
+        // Get inputs
+        for (int i = 0; i < prompts.length; i++) {
+            inputs[i] = getInput(prompts[i]);
+        }
+        
+        // Initialize TeachingRequirement object and add to teachingRequirementService
+        teachingRequirement = new TeachingRequirement(inputs[0], new String[]{inputs[1], inputs[2]});
+        teachingRequirementService.addTeachingRequirement(teachingRequirement);
+    }
+
+	// @ Abs
+	private void viewTeachingRequirements() {
+		System.out.println("The following are our Teaching Requirements:");
+		List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
+		Iterator<TeachingRequirement> iterator = requirements.iterator();
+    
+		while (iterator.hasNext()) {
+			TeachingRequirement requirement = iterator.next();
+			System.out.println(requirement.toString());
+		}
+	}
 }
+   
+
