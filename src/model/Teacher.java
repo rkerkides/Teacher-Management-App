@@ -95,6 +95,14 @@ public class Teacher implements Serializable, Identifiable {
     public void setTrainingSessions(List<TrainingSession> trainingSessions) {
         this.trainingSessions = trainingSessions;
     }
+    
+    // check this
+    public String displayAvailabilities() {
+        return "Teacher{" +
+                "id=" + id +
+                ", availabilities=" + availabilities +                
+                '}';
+    }
 
     @Override
     public String toString() {
