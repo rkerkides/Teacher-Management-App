@@ -80,7 +80,7 @@ public class UserInterface {
             }
         }
     }
-    
+
     public Date getDateInput(String prompt) {
         System.out.println(prompt + " (YYYY-MM-DD)");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -145,10 +145,10 @@ public class UserInterface {
                     pauseBeforeContinuing();
                     break;
                 case 4:
-                	matchTeachersWithRequirements();
+                    matchTeachersWithRequirements();
                     break;
                 case 5:
-                	scheduleTrainingForTeachers();
+                    scheduleTrainingForTeachers();
                     pauseBeforeContinuing();
                     break;
                 case 6:
@@ -198,149 +198,140 @@ public class UserInterface {
 
 
     private void matchTeachersWithRequirements() {
-    	if (teachingRequirementService.getAllTeachingRequirements().isEmpty()) {
-    		System.out.println("There are no outstanding teaching requirements.");
-    		int decision = getIntInput ("\nPress 1 to return to the main menu.");
-        	while (decision != 1) {
-        		decision = getIntInput ("Press 1 to return to the main menu.");
-        	}
-    		return;
-    	}
-    	showMessage("\nPlease select a requirement from the following list to find matching teachers (enter ID number only):\n");
-    	displayAllTeachingRequirements();
-    	int choice = getIntInput("");
-    	
-    	// If number entered is not a valid ID, will continuously request a new number and store new input as choice
-    	while (teachingRequirementService.getTeachingRequirement(choice).isEmpty()) {
-    		showMessage("The number you entered is not a valid Requirement ID. Please enter a valid Requirement ID: ");
-    		choice = getIntInput("");
-    	}
-    	findMatchingTeachers (teachingRequirementService.getTeachingRequirement(choice).get());
-    }
-    
-    private void findMatchingTeachers (TeachingRequirement req) {
-    	List <Teacher> perfectMatches = new ArrayList <Teacher> ();
-    	List <Teacher> onlySubjectMatches = new ArrayList <Teacher> ();
-    	List <Teacher> allQualMatches = new ArrayList <Teacher> ();
-    	int qualsRequired = req.getQualificationsRequired().length;
-    	for (Teacher teacher : teacherService.getAllTeachers()) {
-    		boolean subjectMatch = false;
-    		boolean allQualMatch = false;
-    		int qualMatchCounter = 0;
-    		for (String subject : teacher.getCanTeach()) {
-    			if (matchCheck (req.getSubject(), subject)) {
-    				subjectMatch = true;
-    				break;
-    			}
-    		}
-    		for (String qualRequired : req.getQualificationsRequired()) {
-    			for (String qual : teacher.getQualifications()) {
-    				if (matchCheck (qualRequired, qual)) {
-    					qualMatchCounter++;
-    					break;
-    				}
-    			}
-    		}
-    		if (qualMatchCounter>=qualsRequired) {
-    			allQualMatch = true;
-    		}
-    		
-    		if (subjectMatch && allQualMatch) {
-    			perfectMatches.add(teacher);
-    			continue;
-    		}
-    		else if (subjectMatch) {
-    			onlySubjectMatches.add(teacher);
-    			continue;
-    		}
-    		else if(allQualMatch) {
-    			allQualMatches.add(teacher);
-    			continue;
-    		}
-    		
-    	}
-    	System.out.println ("\nFinding matching teachers for: \n" + req.toString());
-    	if (!(perfectMatches.isEmpty())) {
-    		System.out.println ("\nThe following teachers meet all subject and qualification requirements: ");
-    		for (Teacher teacher : perfectMatches) {
-    			System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-    		}
-    	}
-    	if (!(onlySubjectMatches.isEmpty())) {
-    		System.out.println ("\nThe following teachers can teach the required subject: ");
-    		for (Teacher teacher : onlySubjectMatches) {
-    			System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-    		}
-    	}
-    	if (!(allQualMatches.isEmpty())) {
-    		System.out.println ("\nThe following teachers have all required qualifications: ");
-    		for (Teacher teacher : allQualMatches) {
-    			System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-    		}
-    	}
-    	if (perfectMatches.isEmpty() && onlySubjectMatches.isEmpty() && allQualMatches.isEmpty()) {
-    		System.out.println("\nThere are no teachers that match this requirement.");
-    	}
-    	
-    	int decision = getIntInput ("\nPress 1 to return to the main menu.");
-    	while (decision != 1) {
-    		decision = getIntInput ("Press 1 to return to the main menu.");
-    	}
-    }
-    
-    private boolean matchCheck (String s1, String s2) {
-    	// If strings are equal (non-case-sensitive), return true
-    	if (s1.equalsIgnoreCase(s2)) {
-    		return true;
-    	}
-    	// If strings are substrings of one another, return true
-    	else if (s1.toLowerCase().contains(s2.toLowerCase())) {
-    		return true;
-    	}
-    	else if (s2.toLowerCase().contains(s1.toLowerCase())) {
-    		return true;
-    	}
-    	// If 80% or more of letters of shorter string match, return true, else return false
-    	else {
-    		int counter = 0;
-    		char [] s1Array = s1.toCharArray();
-    		char [] s2Array = s2.toCharArray();
-    		int shortestLength = s1Array.length;
-    		if (s1Array.length>s2Array.length) {
-    			shortestLength = s2Array.length;
-    		}
-    		for (int i = 0; i < shortestLength; i++) {
-    			if (s1Array[i] == s2Array[i]) {
-    				counter++;
-    			}
-    		}
-    		if ((double)counter/shortestLength >= 0.8) {
-    			return true;
-    		}
-    		else {
-    			int wordCounter = 0;
-    			String [] s1Words = s1.toLowerCase().split("\\W+");
-    			String [] s2Words = s2.toLowerCase().split("\\W+");
-    			for (String word : s1Words) {
-    				if (Arrays.asList(s2Words).contains(word.toLowerCase()))  {
-    					wordCounter++;
-    					continue;
-    				}
-    			}
-    			if (wordCounter >= 2) {
-    				return true;
-    			}
-    			else {
-    				return false;
-    			}
-    		}
-    	}
-    }
-    	
+        if (teachingRequirementService.getAllTeachingRequirements().isEmpty()) {
+            System.out.println("There are no outstanding teaching requirements.");
+            int decision = getIntInput("\nPress 1 to return to the main menu.");
+            while (decision != 1) {
+                decision = getIntInput("Press 1 to return to the main menu.");
+            }
+            return;
+        }
+        showMessage("\nPlease select a requirement from the following list to find matching teachers (enter ID number only):\n");
+        displayAllTeachingRequirements();
+        int choice = getIntInput("");
 
-    private void scheduleTrainingForTeachers() {
-    	
+        // If number entered is not a valid ID, will continuously request a new number and store new input as choice
+        while (teachingRequirementService.getTeachingRequirement(choice).isEmpty()) {
+            showMessage("The number you entered is not a valid Requirement ID. Please enter a valid Requirement ID: ");
+            choice = getIntInput("");
+        }
+        findMatchingTeachers(teachingRequirementService.getTeachingRequirement(choice).get());
     }
+
+    private void findMatchingTeachers(TeachingRequirement req) {
+        List<Teacher> perfectMatches = new ArrayList<Teacher>();
+        List<Teacher> onlySubjectMatches = new ArrayList<Teacher>();
+        List<Teacher> allQualMatches = new ArrayList<Teacher>();
+        int qualsRequired = req.getQualificationsRequired().length;
+        for (Teacher teacher : teacherService.getAllTeachers()) {
+            boolean subjectMatch = false;
+            boolean allQualMatch = false;
+            int qualMatchCounter = 0;
+            for (String subject : teacher.getCanTeach()) {
+                if (matchCheck(req.getSubject(), subject)) {
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            for (String qualRequired : req.getQualificationsRequired()) {
+                for (String qual : teacher.getQualifications()) {
+                    if (matchCheck(qualRequired, qual)) {
+                        qualMatchCounter++;
+                        break;
+                    }
+                }
+            }
+            if (qualMatchCounter >= qualsRequired) {
+                allQualMatch = true;
+            }
+
+            if (subjectMatch && allQualMatch) {
+                perfectMatches.add(teacher);
+                continue;
+            } else if (subjectMatch) {
+                onlySubjectMatches.add(teacher);
+                continue;
+            } else if (allQualMatch) {
+                allQualMatches.add(teacher);
+                continue;
+            }
+
+        }
+        System.out.println("\nFinding matching teachers for: \n" + req.toString());
+        if (!(perfectMatches.isEmpty())) {
+            System.out.println("\nThe following teachers meet all subject and qualification requirements: ");
+            for (Teacher teacher : perfectMatches) {
+                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
+            }
+        }
+        if (!(onlySubjectMatches.isEmpty())) {
+            System.out.println("\nThe following teachers can teach the required subject: ");
+            for (Teacher teacher : onlySubjectMatches) {
+                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
+            }
+        }
+        if (!(allQualMatches.isEmpty())) {
+            System.out.println("\nThe following teachers have all required qualifications: ");
+            for (Teacher teacher : allQualMatches) {
+                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
+            }
+        }
+        if (perfectMatches.isEmpty() && onlySubjectMatches.isEmpty() && allQualMatches.isEmpty()) {
+            System.out.println("\nThere are no teachers that match this requirement.");
+        }
+
+        int decision = getIntInput("\nPress 1 to return to the main menu.");
+        while (decision != 1) {
+            decision = getIntInput("Press 1 to return to the main menu.");
+        }
+    }
+
+    private boolean matchCheck(String s1, String s2) {
+        // If strings are equal (non-case-sensitive), return true
+        if (s1.equalsIgnoreCase(s2)) {
+            return true;
+        }
+        // If strings are substrings of one another, return true
+        else if (s1.toLowerCase().contains(s2.toLowerCase())) {
+            return true;
+        } else if (s2.toLowerCase().contains(s1.toLowerCase())) {
+            return true;
+        }
+        // If 80% or more of letters of shorter string match, return true, else return false
+        else {
+            int counter = 0;
+            char[] s1Array = s1.toCharArray();
+            char[] s2Array = s2.toCharArray();
+            int shortestLength = s1Array.length;
+            if (s1Array.length > s2Array.length) {
+                shortestLength = s2Array.length;
+            }
+            for (int i = 0; i < shortestLength; i++) {
+                if (s1Array[i] == s2Array[i]) {
+                    counter++;
+                }
+            }
+            if ((double) counter / shortestLength >= 0.8) {
+                return true;
+            } else {
+                int wordCounter = 0;
+                String[] s1Words = s1.toLowerCase().split("\\W+");
+                String[] s2Words = s2.toLowerCase().split("\\W+");
+                for (String word : s1Words) {
+                    if (Arrays.asList(s2Words).contains(word.toLowerCase())) {
+                        wordCounter++;
+                        continue;
+                    }
+                }
+                if (wordCounter >= 2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
     private void addTeacher() {
         // Similar to the inputTeacher() method, but directly adds the teacher to the service
         Teacher newTeacher = inputTeacher();
@@ -465,18 +456,18 @@ public class UserInterface {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
-    
+
     // case 5 logic @Bariscan
     public void scheduleTrainingForTeachers() {
         List<Teacher> teachers = teacherService.getAllTeachers();
-        teachers.forEach(System.out::println); 
+        teachers.forEach(System.out::println);
 
         int teacherId = getIntInput("Enter ID of Teacher to schedule training for:");
 
         Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
         if (!optionalTeacher.isPresent()) {
             System.out.println("Teacher not found.");
-            return; 
+            return;
         }
         Teacher selectedTeacher = optionalTeacher.get();
 
@@ -486,7 +477,7 @@ public class UserInterface {
 
         if (!selectedTeacher.getAvailabilities().contains(date)) {
             System.out.println("Date not available for this teacher.");
-            return; 
+            return;
         }
 
         selectedTeacher.getAvailabilities().remove(date);
@@ -498,17 +489,6 @@ public class UserInterface {
         trainingSessionService.addTrainingSession(newSession);
 
         System.out.println("Training Session Scheduled:");
-        System.out.println(newSession.toString());
+        System.out.println(newSession);
     }
-
-    // View Teaching Requirements
-    private void viewTeachingRequirements() {
-        System.out.println("The following are our Teaching Requirements:");
-        List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
-        Iterator<TeachingRequirement> iterator = requirements.iterator();
-
-        while (iterator.hasNext()) {
-            TeachingRequirement requirement = iterator.next();
-            System.out.println(requirement.toString());
-        }
-    }
+}
