@@ -458,7 +458,7 @@ public class UserInterface {
     }
 
     // case 5 logic @Bariscan
-    public void scheduleTrainingForTeachers() {
+    private void scheduleTrainingForTeachers() {
         List<Teacher> teachers = teacherService.getAllTeachers();
         teachers.forEach(System.out::println);
 
