@@ -134,7 +134,8 @@ public class UserInterface {
             int choice = getIntInput("");
             switch (choice) {
                 case 1:
-                    // Implement feature using teachingRequirementService
+                    inputTeachingRequirements();
+					pauseBeforeContinuing();
                     break;
                 case 2:
                     displayAllTeachingRequirements();
@@ -491,4 +492,29 @@ public class UserInterface {
         System.out.println("Training Session Scheduled:");
         System.out.println(newSession);
     }
+	
+	// Case 1 @Abs
+	private void inputTeachingRequirements() {
+		showMessage("Please enter the teaching requirements.");
+		
+		String subject = getInput("Please enter your subject: ");
+		List<String> qualifications = new ArrayList<>();
+		String qualificationInput;
+		do {
+			qualificationInput = getInput("Please enter a qualification (or type 'done' to finish): ");
+			if (!"done".equalsIgnoreCase(qualificationInput)) {
+				qualifications.add(qualificationInput);
+			}
+		} while (!"done".equalsIgnoreCase(qualificationInput));
+		
+		String experience = getInput("Please enter your experience:");
+		String educationLevel = getInput("Please enter your education level:");
+		
+		// Add the new teaching requirement to the teachingRequirementService
+		TeachingRequirement newRequirement = new TeachingRequirement(subject, qualifications, experience, educationLevel);
+		teachingRequirementService.addTeachingRequirement(newRequirement);
+		
+		showMessage("Teaching requirement successfully added.");
+	}
+
 }
