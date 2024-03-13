@@ -7,6 +7,7 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Teacher implements Serializable, Identifiable {
@@ -19,22 +20,10 @@ public class Teacher implements Serializable, Identifiable {
     private String experience;
     private List<String> canTeach;
     private List<TrainingSession> trainingSessions;
+    private List<TeachingRequirement> teachingRequirements;
 
-    // Modified Short Constructor
-    public Teacher(String name, String experience) {
-        this.id = IdGenerator.generateTeacherId(); // Use IdGenerator for ID
-        this.name = name;
-        this.twoHourSlotAvailabilities = new ArrayList<>();
-        this.qualifications = new ArrayList<>();
-        this.experience = experience;
-        this.canTeach = new ArrayList<>();
-        this.trainingSessions = new ArrayList<>();
-    }
-
-    // Modified Constructor
-    // Removed the ID parameter since ID should not be set externally
     public Teacher(String name, List<Time> twoHourSlotAvailabilities, List<String> qualifications, String experience,
-                   List<String> canTeach, List<TrainingSession> trainingSessions, List<String> daysOfWeekAvailable) {
+                   List<String> canTeach, List<TrainingSession> trainingSessions, List<String> daysOfWeekAvailable, List<TeachingRequirement> teachingRequirements) {
         this.id = IdGenerator.generateTeacherId(); // Use IdGenerator for ID
         this.name = name;
         this.twoHourSlotAvailabilities = twoHourSlotAvailabilities;
@@ -43,6 +32,7 @@ public class Teacher implements Serializable, Identifiable {
         this.canTeach = canTeach;
         this.trainingSessions = trainingSessions;
         this.daysOfWeekAvailable = daysOfWeekAvailable;
+        this.teachingRequirements = teachingRequirements;
     }
 
     // Getters and Setters
@@ -114,6 +104,22 @@ public class Teacher implements Serializable, Identifiable {
     public void removeTrainingSession(TrainingSession trainingSession) {
         trainingSessions.remove(trainingSession);
     }
+
+    public List<TeachingRequirement> getTeachingRequirements() {
+        return teachingRequirements;
+    }
+
+    public void setTeachingRequirements(List<TeachingRequirement> teachingRequirements) {
+        this.teachingRequirements = teachingRequirements;
+    }
+
+    public void addTeachingRequirement(TeachingRequirement teachingRequirement) {
+        teachingRequirements.add(teachingRequirement);
+    }
+
+    public void removeTeachingRequirement(TeachingRequirement teachingRequirement) {
+        teachingRequirements.remove(teachingRequirement);
+    }
     
     // check this
     public String displayAvailabilities() {
@@ -127,38 +133,41 @@ public class Teacher implements Serializable, Identifiable {
     public String toString() {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
-        // Process each availability slot to format it into "start time - end time"
-        String availabilitiesFormatted = twoHourSlotAvailabilities.stream()
+        String availabilitiesFormatted = Optional.ofNullable(twoHourSlotAvailabilities).orElseGet(ArrayList::new).stream()
                 .map(time -> {
-                    // Start time as String
                     String startTimeStr = timeFormat.format(time);
-
-                    // Calculate end time by adding 2 hours (7200000 ms) to the start time
                     Time endTime = new Time(time.getTime() + 7200000); // Adding 2 hours in milliseconds
                     String endTimeStr = timeFormat.format(endTime);
-
                     return startTimeStr + " - " + endTimeStr;
                 })
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(", ", "[", "]"));
 
-        String qualificationsFormatted = String.join(", ", qualifications);
-        String canTeachFormatted = String.join(", ", canTeach);
+        String qualificationsFormatted = qualifications != null ? String.join(", ", qualifications) : "None";
+        String canTeachFormatted = canTeach != null ? String.join(", ", canTeach) : "None";
+        String daysOfWeekAvailableFormatted = daysOfWeekAvailable != null ? String.join(", ", daysOfWeekAvailable) : "None";
 
-        // Update for training sessions to only include time slot and day of the week
-        String trainingSessionsFormatted = trainingSessions.stream()
-                .map(session -> "Day of the Week: " + session.getDay() +
+        String trainingSessionsFormatted = Optional.ofNullable(trainingSessions).orElseGet(ArrayList::new).stream()
+                .map(session -> "Day: " + session.getDay() +
                         ", Time Slot: " + timeFormat.format(session.getTwoHourSlotStartTime()) + " - " +
                         timeFormat.format(new Time(session.getTwoHourSlotStartTime().getTime() + 7200000)))
-                .collect(Collectors.joining("; "));
+                .collect(Collectors.joining("; ", "[", "]"));
+
+        String teachingRequirementsFormatted = Optional.ofNullable(teachingRequirements).orElseGet(ArrayList::new).stream()
+                .map(requirement -> "Subject: " + requirement.getSubject() +
+                        ", Day(s): " + String.join(", ", requirement.getDaysOfWeek()) +
+                        ", Time Slot: " + (requirement.getStartTime() != null ? timeFormat.format(requirement.getStartTime()) + " - " +
+                        timeFormat.format(new Time(requirement.getStartTime().getTime() + 7200000)) : "Not specified"))
+                .collect(Collectors.joining("; ", "[", "]"));
 
         return "Teacher Information:\n" +
                 "  Name: " + name + "\n" +
                 "  ID: " + id + "\n" +
                 "  Experience: " + experience + "\n" +
-                "  Availabilities: [" + availabilitiesFormatted + "]\n" +
-                "  Days of Week Available: " + daysOfWeekAvailable + "\n" +
-                "  Qualifications: [" + qualificationsFormatted + "]\n" +
-                "  Can Teach: [" + canTeachFormatted + "]\n" +
-                "  Training Sessions: [" + trainingSessionsFormatted + "]";
+                "  Availabilities: " + availabilitiesFormatted + "\n" +
+                "  Days of Week Available: " + daysOfWeekAvailableFormatted + "\n" +
+                "  Qualifications: " + qualificationsFormatted + "\n" +
+                "  Can Teach: " + canTeachFormatted + "\n" +
+                "  Training Sessions: " + trainingSessionsFormatted + "\n" +
+                "  Teaching Requirements: " + teachingRequirementsFormatted + "\n";
     }
 }

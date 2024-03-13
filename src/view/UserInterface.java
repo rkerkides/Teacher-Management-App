@@ -263,6 +263,16 @@ public class UserInterface {
             System.out.println("There are no outstanding teaching requirements.");
             return;
         }
+        boolean unassigned = false;
+        for (TeachingRequirement requirement : requirements) {
+            if (requirement.getTeacher() == null) {
+                unassigned = true;
+            }
+        }
+        if (!unassigned) {
+            System.out.println("\nAll teaching requirements have already been assigned a teacher.");
+            return;
+        }
         System.out.println("\nPlease select a requirement from the following list to find matching teachers:");
         displayAllTeachingRequirements();
         int reqId = getIntInput("Enter the ID of the requirement:");
@@ -302,10 +312,28 @@ public class UserInterface {
         displayMatchResults("Matches by Subject:", subjectMatches);
         displayMatchResults("Matches by Qualifications:", qualificationMatches);
 
-        String message = "\nWould you like to schedule a training session for any of these teachers?";
+        String message = "\nWould you like to associate a teacher with this requirement?";
         if (getYesNoInput(message)) {
-            scheduleTrainingForTeachers();
+            associateTeacherWithRequirement(req);
         }
+    }
+
+    private void associateTeacherWithRequirement(TeachingRequirement req) {
+        System.out.println("\nEnter the ID of the teacher you would like to associate with this requirement:");
+        int teacherId = getIntInput("Enter Teacher ID:");
+
+        Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
+        if (optionalTeacher.isEmpty()) {
+            System.out.println("Teacher not found.");
+            return;
+        }
+
+        Teacher teacher = optionalTeacher.get();
+        req.setTeacher(teacher);
+        teachingRequirementService.updateTeachingRequirement(req);
+        teacher.addTeachingRequirement(req);
+        teacherService.updateTeacher(teacher);
+        System.out.println("Teacher associated with requirement successfully.");
     }
 
     private void displayMatchResults(String header, List<Teacher> matches) {
@@ -341,6 +369,7 @@ public class UserInterface {
         List<String> canTeach = new ArrayList<>();
         List<TrainingSession> trainingSessions = new ArrayList<>();
         List<String> daysOfWeekAvailable = new ArrayList<>();
+        List<TeachingRequirement> teachingRequirements = new ArrayList<>();
 
         // Add qualifications
         if (getYesNoInput("Would you like to add qualifications?")) {
@@ -370,8 +399,9 @@ public class UserInterface {
             } while (getYesNoInput("Would you like to add another subject?"));
         }
 
-        // Note: Adding TrainingSessions to the teacher would require additional logic
-        return new Teacher(name, availabilities, qualifications, experience, canTeach, trainingSessions, daysOfWeekAvailable);
+        // TrainingSessions are not added here as they are scheduled separately
+        return new Teacher(name, availabilities, qualifications, experience,
+                canTeach, trainingSessions, daysOfWeekAvailable, teachingRequirements);
     }
 
     /**
@@ -408,7 +438,7 @@ public class UserInterface {
             teacher.setQualifications(newQualifications);
         }
 
-        if (getYesNoInput("Would you like to update the teacher's time availabilities?")) {
+        if (getYesNoInput("Would you like to add to the teacher's time availabilities?")) {
             List<Time> newAvailabilities = new ArrayList<>();
             do {
                 Time time = getTimeInput("Enter a new availability");
@@ -418,12 +448,12 @@ public class UserInterface {
             teacher.setAvailabilities(newAvailabilities);
         }
 
-        if (getYesNoInput("Would you like to update the days of the week the teacher is available?")) {
+        if (getYesNoInput("Would you like to add to the days of the week the teacher is available?")) {
             List<String> newDaysOfWeek = getDaysOfWeekInput("Select the days of the week the teacher is available:");
             teacher.setDaysOfWeekAvailable(newDaysOfWeek);
         }
 
-        if (getYesNoInput("Would you like to update the subjects the teacher can teach?")) {
+        if (getYesNoInput("Would you like to add to the subjects the teacher can teach?")) {
             List<String> newCanTeach = new ArrayList<>();
             do {
                 String subject = getInput("Enter a subject (leave blank to finish):");
@@ -466,7 +496,7 @@ public class UserInterface {
             return;
         }
         List<Teacher> teachers = teacherService.getAllTeachers();
-        teachers.forEach(teacher -> System.out.println(teacher.toString() + "\n"));
+        teachers.forEach(teacher -> System.out.println("\n"+ teacher.toString()));
     }
 
     /**
@@ -523,6 +553,7 @@ public class UserInterface {
         TrainingSession newSession = new TrainingSession(dayOfWeek, selectedTeacher, subject, timeSlot);
         trainingSessionService.addTrainingSession(newSession);
         selectedTeacher.addTrainingSession(newSession);
+        teacherService.updateTeacher(selectedTeacher);
 
         System.out.println("Training Session Scheduled:");
         System.out.println(newSession);

@@ -96,11 +96,9 @@ public class TeachingRequirement implements Serializable, Identifiable {
                 "  ID: " + id + "\n" +
                 "  Subject: " + subject + "\n" +
                 "  Days of Week: " + daysOfWeekFormatted + "\n" +
-                "  Start Time: " + (startTime != null ? startTime.toString() : "Not specified") + "\n" +
-                // Always 2 hours after start time
-                "  End Time: " + (startTime != null ? new Time(startTime.getTime() + 7200000).toString() : "Not specified") + "\n" +
+                "  Time Slot: " + (startTime != null ? startTime + " to " + new Time(startTime.getTime() + 7200000) : "Not specified") + "\n" +
                 "  Qualifications Preferred: [" + qualificationsFormatted + "]\n" +
-                "  Experience: " + experience + " years\n" +
-                "  Teacher: " + teacherName + "\n";
+                "  Experience Preferred: " + experience + " years\n" +
+                "  Teacher Assigned: " + teacherName + "\n";
     }
 }
