@@ -553,6 +553,7 @@ public class UserInterface {
         TrainingSession newSession = new TrainingSession(dayOfWeek, selectedTeacher, subject, timeSlot);
         trainingSessionService.addTrainingSession(newSession);
         selectedTeacher.addTrainingSession(newSession);
+        selectedTeacher.getAvailabilities().remove(timeSlot); // Remove the time slot from the teacher's availability
         teacherService.updateTeacher(selectedTeacher);
 
         System.out.println("Training Session Scheduled:");

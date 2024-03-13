@@ -163,7 +163,7 @@ public class Teacher implements Serializable, Identifiable {
                 "  Name: " + name + "\n" +
                 "  ID: " + id + "\n" +
                 "  Experience: " + experience + "\n" +
-                "  Availabilities: " + availabilitiesFormatted + "\n" +
+                "  Training Availabilities: " + availabilitiesFormatted + "\n" +
                 "  Days of Week Available: " + daysOfWeekAvailableFormatted + "\n" +
                 "  Qualifications: " + qualificationsFormatted + "\n" +
                 "  Can Teach: " + canTeachFormatted + "\n" +
