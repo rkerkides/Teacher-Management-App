@@ -7,8 +7,6 @@ import service.TeachingRequirementService;
 import service.TrainingSessionService;
 import view.UserInterface;
 
-import java.util.List;
-
 public class Main {
     public static void main(String[] args) {
         // Instantiate DAOs first to ensure IdGenerator is initialized
