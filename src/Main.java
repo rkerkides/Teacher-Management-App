@@ -7,6 +7,8 @@ import service.TeachingRequirementService;
 import service.TrainingSessionService;
 import view.UserInterface;
 
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         // Instantiate DAOs first to ensure IdGenerator is initialized
@@ -25,5 +27,16 @@ public class Main {
         ui.setTeachingRequirementService(teachingRequirementService);
         ui.setTrainingSessionService(trainingSessionService);
         ui.displayMainMenu();
+    }
+
+    private static void rebuildAssociations(TeacherService teacherService, TrainingSessionService trainingSessionService) {
+        List<TrainingSession> sessions = trainingSessionService.getAllTrainingSessions();
+        sessions.forEach(session -> {
+            // Assuming TrainingSession has getTeacherId() method
+            int teacherId = session.getTeacherId();
+            teacherService.getTeacher(teacherId).ifPresent(teacher -> {
+                teacher.addTrainingSession(session);
+            });
+        });
     }
 }

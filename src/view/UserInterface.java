@@ -7,10 +7,15 @@ import model.Teacher;
 import model.TeachingRequirement;
 import service.TrainingSessionService;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * The UserInterface class provides a user interface for interacting with the Part-Time Teachers Management System.
+ * It handles user input, displays menus, and calls the appropriate service methods.
+ */
 public class UserInterface {
     private static UserInterface instance;
     private final Scanner scanner;
@@ -22,6 +27,11 @@ public class UserInterface {
         scanner = new Scanner(System.in);
     }
 
+    /**
+     * Returns the singleton instance of the UserInterface.
+     *
+     * @return The instance of the UserInterface.
+     */
     public static UserInterface getInstance() {
         if (instance == null) {
             instance = new UserInterface();
@@ -58,15 +68,6 @@ public class UserInterface {
         return input;
     }
 
-    public double getDoubleInput(String prompt) {
-        System.out.println(prompt);
-        while (!scanner.hasNextDouble()) {
-            scanner.next(); // Read and discard unwanted input
-            System.out.println("Invalid input. Please enter a number.");
-        }
-        return scanner.nextDouble();
-    }
-
     public boolean getYesNoInput(String prompt) {
         System.out.println(prompt + " (yes/no)");
         while (true) {
@@ -94,6 +95,55 @@ public class UserInterface {
         }
     }
 
+    public Time getTimeInput(String prompt) {
+        System.out.println(prompt + " (HH:MM)");
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        timeFormatter.setLenient(false); // Ensure strict parsing, e.g., no 25:61
+
+        while (true) {
+            String input = scanner.nextLine().trim();
+            try {
+                // Parse the input as a java.util.Date object first
+                java.util.Date parsedTime = timeFormatter.parse(input);
+
+                // Convert java.util.Date to java.sql.Time
+                Time time = new Time(parsedTime.getTime());
+
+                return time;
+            } catch (ParseException e) {
+                System.out.println("Invalid input. Please enter a time in the format HH:MM.");
+            }
+        }
+    }
+
+    public List<String> getDaysOfWeekInput(String prompt) {
+        List<String> daysOfWeek = new ArrayList<>();
+        String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+        System.out.println(prompt);
+        for (int i = 0; i < days.length; i++) {
+            System.out.println((i + 1) + ". " + days[i]);
+        }
+        System.out.println("Enter the numbers corresponding to the days (e.g., 1 for Sunday, 2 for Monday). Enter '0' when finished:");
+
+        while (true) {
+            int input = getIntInput("Select a day:");
+            if (input == 0) {
+                break; // Exit loop when user is done
+            } else if (input > 0 && input <= days.length) {
+                String selectedDay = days[input - 1];
+                if (!daysOfWeek.contains(selectedDay)) { // Avoid duplicate entries
+                    daysOfWeek.add(selectedDay);
+                } else {
+                    System.out.println(selectedDay + " is already selected. Please choose another day or enter '0' to finish.");
+                }
+            } else {
+                System.out.println("Invalid selection. Please enter a number between 1 and 7, or '0' to finish.");
+            }
+        }
+        return daysOfWeek;
+    }
+
     public void showMessage(String message) {
         System.out.println(message);
     }
@@ -117,7 +167,9 @@ public class UserInterface {
         return date;
     }
 
-    // Public method to display the main menu
+    /**
+     * Displays the main menu and handles user input.
+     */
     public void displayMainMenu() {
         boolean exit = false;
 
@@ -163,13 +215,18 @@ public class UserInterface {
         }
     }
 
-    // Helper method for making a smoother transition back to the main menu after completing a task
+    /**
+     * Pauses the program and waits for the user to press Enter before returning to the main menu.
+     */
     private void pauseBeforeContinuing() {
         showMessage("\nPress Enter to return to the main menu...");
         scanner.nextLine();
     }
 
 
+    /**
+     * Displays a menu for maintaining the teacher database and handles user input.
+     */
     private void maintainTeacherDatabase() {
         System.out.println("Choose an option:");
         System.out.println("1. Add Teacher");
@@ -197,156 +254,93 @@ public class UserInterface {
         }
     }
 
-
+    /**
+     * Displays a menu for matching teachers with teaching requirements and handles user input.
+     */
     private void matchTeachersWithRequirements() {
-        if (teachingRequirementService.getAllTeachingRequirements().isEmpty()) {
+        List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
+        if (requirements.isEmpty()) {
             System.out.println("There are no outstanding teaching requirements.");
-            int decision = getIntInput("\nPress 1 to return to the main menu.");
-            while (decision != 1) {
-                decision = getIntInput("Press 1 to return to the main menu.");
-            }
             return;
         }
-        showMessage("\nPlease select a requirement from the following list to find matching teachers (enter ID number only):\n");
+        System.out.println("\nPlease select a requirement from the following list to find matching teachers:");
         displayAllTeachingRequirements();
-        int choice = getIntInput("");
+        int reqId = getIntInput("Enter the ID of the requirement:");
 
-        // If number entered is not a valid ID, will continuously request a new number and store new input as choice
-        while (teachingRequirementService.getTeachingRequirement(choice).isEmpty()) {
-            showMessage("The number you entered is not a valid Requirement ID. Please enter a valid Requirement ID: ");
-            choice = getIntInput("");
+        TeachingRequirement selectedReq = teachingRequirementService.getTeachingRequirement(reqId).orElse(null);
+        if (selectedReq == null) {
+            System.out.println("Invalid requirement ID.");
+            return;
         }
-        findMatchingTeachers(teachingRequirementService.getTeachingRequirement(choice).get());
+        findMatchingTeachers(selectedReq);
     }
 
+
+    /**
+     * Finds and displays teachers matching the given teaching requirement.
+     *
+     * @param req The teaching requirement to match teachers with.
+     */
     private void findMatchingTeachers(TeachingRequirement req) {
-        List<Teacher> perfectMatches = new ArrayList<Teacher>();
-        List<Teacher> onlySubjectMatches = new ArrayList<Teacher>();
-        List<Teacher> allQualMatches = new ArrayList<Teacher>();
-        int qualsRequired = req.getQualificationsRequired().length;
+        List<Teacher> perfectMatches = new ArrayList<>();
+        List<Teacher> subjectMatches = new ArrayList<>();
+        List<Teacher> qualificationMatches = new ArrayList<>();
+
         for (Teacher teacher : teacherService.getAllTeachers()) {
-            boolean subjectMatch = false;
-            boolean allQualMatch = false;
-            int qualMatchCounter = 0;
-            for (String subject : teacher.getCanTeach()) {
-                if (matchCheck(req.getSubject(), subject)) {
-                    subjectMatch = true;
-                    break;
-                }
-            }
-            for (String qualRequired : req.getQualificationsRequired()) {
-                for (String qual : teacher.getQualifications()) {
-                    if (matchCheck(qualRequired, qual)) {
-                        qualMatchCounter++;
-                        break;
-                    }
-                }
-            }
-            if (qualMatchCounter >= qualsRequired) {
-                allQualMatch = true;
-            }
-
-            if (subjectMatch && allQualMatch) {
-                perfectMatches.add(teacher);
-                continue;
-            } else if (subjectMatch) {
-                onlySubjectMatches.add(teacher);
-                continue;
-            } else if (allQualMatch) {
-                allQualMatches.add(teacher);
-                continue;
-            }
-
-        }
-        System.out.println("\nFinding matching teachers for: \n" + req.toString());
-        if (!(perfectMatches.isEmpty())) {
-            System.out.println("\nThe following teachers meet all subject and qualification requirements: ");
-            for (Teacher teacher : perfectMatches) {
-                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-            }
-        }
-        if (!(onlySubjectMatches.isEmpty())) {
-            System.out.println("\nThe following teachers can teach the required subject: ");
-            for (Teacher teacher : onlySubjectMatches) {
-                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-            }
-        }
-        if (!(allQualMatches.isEmpty())) {
-            System.out.println("\nThe following teachers have all required qualifications: ");
-            for (Teacher teacher : allQualMatches) {
-                System.out.println(teacher.getName() + " (ID: " + teacher.getId() + ")");
-            }
-        }
-        if (perfectMatches.isEmpty() && onlySubjectMatches.isEmpty() && allQualMatches.isEmpty()) {
-            System.out.println("\nThere are no teachers that match this requirement.");
-        }
-
-        int decision = getIntInput("\nPress 1 to return to the main menu.");
-        while (decision != 1) {
-            decision = getIntInput("Press 1 to return to the main menu.");
-        }
-    }
-
-    private boolean matchCheck(String s1, String s2) {
-        // If strings are equal (non-case-sensitive), return true
-        if (s1.equalsIgnoreCase(s2)) {
-            return true;
-        }
-        // If strings are substrings of one another, return true
-        else if (s1.toLowerCase().contains(s2.toLowerCase())) {
-            return true;
-        } else if (s2.toLowerCase().contains(s1.toLowerCase())) {
-            return true;
-        }
-        // If 80% or more of letters of shorter string match, return true, else return false
-        else {
-            int counter = 0;
-            char[] s1Array = s1.toCharArray();
-            char[] s2Array = s2.toCharArray();
-            int shortestLength = s1Array.length;
-            if (s1Array.length > s2Array.length) {
-                shortestLength = s2Array.length;
-            }
-            for (int i = 0; i < shortestLength; i++) {
-                if (s1Array[i] == s2Array[i]) {
-                    counter++;
-                }
-            }
-            if ((double) counter / shortestLength >= 0.8) {
-                return true;
-            } else {
-                int wordCounter = 0;
-                String[] s1Words = s1.toLowerCase().split("\\W+");
-                String[] s2Words = s2.toLowerCase().split("\\W+");
-                for (String word : s1Words) {
-                    if (Arrays.asList(s2Words).contains(word.toLowerCase())) {
-                        wordCounter++;
-                        continue;
-                    }
-                }
-                if (wordCounter >= 2) {
-                    return true;
+            if (teacher.getCanTeach().contains(req.getSubject())) {
+                if (new HashSet<>(teacher.getQualifications()).containsAll(req.getQualificationsRequired())) {
+                    perfectMatches.add(teacher);
                 } else {
-                    return false;
+                    subjectMatches.add(teacher);
                 }
+            } else if (new HashSet<>(teacher.getQualifications()).containsAll(req.getQualificationsRequired())) {
+                qualificationMatches.add(teacher);
+            }
+        }
+
+        displayMatchResults("Perfect Matches (Subject & Qualifications):", perfectMatches);
+        displayMatchResults("Matches by Subject:", subjectMatches);
+        displayMatchResults("Matches by Qualifications:", qualificationMatches);
+
+        String message = "\nWould you like to schedule a training session for any of these teachers?";
+        if (getYesNoInput(message)) {
+            scheduleTrainingForTeachers();
+        }
+    }
+
+    private void displayMatchResults(String header, List<Teacher> matches) {
+        System.out.println("\n" + header);
+        if (matches.isEmpty()) {
+            System.out.println("None");
+        } else {
+            for (Teacher match : matches) {
+                System.out.println(match.getName() + " (ID: " + match.getId() + ")");
             }
         }
     }
 
+    /**
+     * Prompts the user to input a new teacher and adds it to the teacher service.
+     */
     private void addTeacher() {
-        // Similar to the inputTeacher() method, but directly adds the teacher to the service
         Teacher newTeacher = inputTeacher();
         teacherService.addTeacher(newTeacher);
         System.out.println("Teacher added successfully!");
     }
 
+    /**
+     * Prompts the user to input teacher details and returns a new Teacher object.
+     *
+     * @return The new Teacher object created from user input.
+     */
     public Teacher inputTeacher() {
         String name = getInput("Enter the teacher's name:");
         String experience = getInput("Enter the teacher's experience:");
-        List<Date> availabilities = new ArrayList<>();
+        List<Time> availabilities = new ArrayList<>();
         List<String> qualifications = new ArrayList<>();
         List<String> canTeach = new ArrayList<>();
         List<TrainingSession> trainingSessions = new ArrayList<>();
+        List<String> daysOfWeekAvailable = new ArrayList<>();
 
         // Add qualifications
         if (getYesNoInput("Would you like to add qualifications?")) {
@@ -359,8 +353,13 @@ public class UserInterface {
         // Add availabilities
         if (getYesNoInput("Would you like to add availabilities?")) {
             do {
-                availabilities.add(inputDate());
+                availabilities.add(getTimeInput("Enter an availability"));
             } while (getYesNoInput("Would you like to add another availability?"));
+        }
+
+        // Add days of the week available
+        if (getYesNoInput("Would you like to add days of the week available?")) {
+            daysOfWeekAvailable = getDaysOfWeekInput("Select the days of the week the teacher is available:");
         }
 
         // Add subjects the teacher can teach
@@ -372,9 +371,12 @@ public class UserInterface {
         }
 
         // Note: Adding TrainingSessions to the teacher would require additional logic
-        return new Teacher(name, availabilities, qualifications, experience, canTeach, trainingSessions);
+        return new Teacher(name, availabilities, qualifications, experience, canTeach, trainingSessions, daysOfWeekAvailable);
     }
 
+    /**
+     * Prompts the user to update a teacher's details and updates the teacher in the service.
+     */
     private void updateTeacher() {
         int teacherId = getIntInput("Enter the ID of the teacher you want to update:");
         Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
@@ -406,14 +408,19 @@ public class UserInterface {
             teacher.setQualifications(newQualifications);
         }
 
-        if (getYesNoInput("Would you like to update the teacher's availabilities?")) {
-            List<Date> newAvailabilities = new ArrayList<>();
+        if (getYesNoInput("Would you like to update the teacher's time availabilities?")) {
+            List<Time> newAvailabilities = new ArrayList<>();
             do {
-                Date date = inputDate();
-                newAvailabilities.add(date);
+                Time time = getTimeInput("Enter a new availability");
+                newAvailabilities.add(time);
                 if (!getYesNoInput("Would you like to add another availability?")) break;
             } while (true);
             teacher.setAvailabilities(newAvailabilities);
+        }
+
+        if (getYesNoInput("Would you like to update the days of the week the teacher is available?")) {
+            List<String> newDaysOfWeek = getDaysOfWeekInput("Select the days of the week the teacher is available:");
+            teacher.setDaysOfWeekAvailable(newDaysOfWeek);
         }
 
         if (getYesNoInput("Would you like to update the subjects the teacher can teach?")) {
@@ -435,8 +442,10 @@ public class UserInterface {
     }
 
 
-    // Removes teachers from the database
-    // Ids are not changed after removal to ensure referential integrity
+    /**
+     * Removes a teacher from the teacher service based on the user input.
+     * IDs are not updated after removal in order to ensure referential integrity.
+     */
     private void removeTeacher() {
         int teacherId = getIntInput("Enter the ID of the teacher you want to remove:");
         boolean success = teacherService.removeTeacher(teacherId);
@@ -448,73 +457,103 @@ public class UserInterface {
         }
     }
 
+    /**
+     * Displays all teachers in the teacher service.
+     */
     private void viewAllTeachers() {
+        if (teacherService.getAllTeachers().isEmpty()) {
+            showMessage("\nNo teachers available.");
+            return;
+        }
         List<Teacher> teachers = teacherService.getAllTeachers();
         teachers.forEach(teacher -> System.out.println(teacher.toString() + "\n"));
     }
 
+    /**
+     * Displays all teaching requirements in the teaching requirement service.
+     */
     public void displayAllTeachingRequirements() {
         List<TeachingRequirement> requirements = teachingRequirementService.getAllTeachingRequirements();
         requirements.forEach(requirement -> System.out.println(requirement.toString()));
     }
 
-    // case 5 logic @Bariscan
+    /**
+     * Schedules a training session for a selected teacher based on their ID. It checks if the selected
+     * teacher is available on the chosen date and schedules a training session for a specific subject and course
+     * if the date is available. It then removes the date from the teacher's availability.
+     */
     private void scheduleTrainingForTeachers() {
         List<Teacher> teachers = teacherService.getAllTeachers();
-        teachers.forEach(System.out::println);
+        if (teachers.isEmpty()) {
+            showMessage("No teachers available.");
+            return;
+        }
+        teachers.forEach(teacher -> System.out.println(teacher)); // Display all teachers for selection
 
-        int teacherId = getIntInput("Enter ID of Teacher to schedule training for:");
-
+        int teacherId = getIntInput("Enter the ID of the Teacher to schedule training for:");
         Optional<Teacher> optionalTeacher = teacherService.getTeacher(teacherId);
         if (!optionalTeacher.isPresent()) {
-            System.out.println("Teacher not found.");
+            showMessage("Teacher not found.");
             return;
         }
         Teacher selectedTeacher = optionalTeacher.get();
 
-        System.out.println(selectedTeacher.displayAvailabilities());
-
-        Date date = getDateInput("Enter date to schedule training for (YYYY-MM-DD):");
-
-        if (!selectedTeacher.getAvailabilities().contains(date)) {
-            System.out.println("Date not available for this teacher.");
+        if (selectedTeacher.getDaysOfWeekAvailable().isEmpty()) {
+            showMessage("This teacher has no availability.");
             return;
         }
 
-        selectedTeacher.getAvailabilities().remove(date);
+        showMessage("Select a day for the training session from the teacher's availability: ");
+        selectedTeacher.getDaysOfWeekAvailable().forEach(System.out::println);
+        String dayOfWeek = getInput("Select the day for the training session:");
+        if (!selectedTeacher.getDaysOfWeekAvailable().contains(dayOfWeek)) {
+            showMessage("Invalid selection or teacher is not available on this day.");
+            return;
+        }
 
-        String subject = getInput("Enter subject to schedule training for:");
-        String course = getInput("Enter course to schedule training for:");
+        Time timeSlot = getTimeInput("Enter the start time for the 2-hour training session");
 
-        TrainingSession newSession = new TrainingSession(date, selectedTeacher, subject, course);
+        if (!selectedTeacher.getAvailabilities().contains(timeSlot)) {
+            showMessage("Invalid selection or teacher is not available at this time.");
+            return;
+        }
+        String subject = getInput("Enter the subject for the training session:");
+
+        // Assuming a method to create and add a training session to the system and teacher
+        TrainingSession newSession = new TrainingSession(dayOfWeek, selectedTeacher, subject, timeSlot);
         trainingSessionService.addTrainingSession(newSession);
+        selectedTeacher.addTrainingSession(newSession);
 
         System.out.println("Training Session Scheduled:");
         System.out.println(newSession);
     }
-	
-	// Case 1 @Abs
-	private void inputTeachingRequirements() {
-		showMessage("Please enter the teaching requirements.");
-		
-		String subject = getInput("Please enter your subject: ");
-		List<String> qualifications = new ArrayList<>();
-		String qualificationInput;
-		do {
-			qualificationInput = getInput("Please enter a qualification (or type 'done' to finish): ");
-			if (!"done".equalsIgnoreCase(qualificationInput)) {
-				qualifications.add(qualificationInput);
-			}
-		} while (!"done".equalsIgnoreCase(qualificationInput));
-		
-		String experience = getInput("Please enter your experience:");
-		String educationLevel = getInput("Please enter your education level:");
-		
-		// Add the new teaching requirement to the teachingRequirementService
-		TeachingRequirement newRequirement = new TeachingRequirement(subject, qualifications, experience, educationLevel);
-		teachingRequirementService.addTeachingRequirement(newRequirement);
-		
-		showMessage("Teaching requirement successfully added.");
-	}
+
+    /**
+     * Prompts the user to input the details for a new teaching requirement and adds it to the teaching requirement service.
+     */
+    private void inputTeachingRequirements() {
+        showMessage("\nEnter the details for the new teaching requirement.");
+
+        String subject = getInput("Required subject:");
+
+        // Initialize qualifications list
+        List<String> qualifications = new ArrayList<>();
+        if (getYesNoInput("Would you like to add qualifications?")) {
+            do {
+                String qualification = getInput("Enter a qualification:");
+                qualifications.add(qualification);
+            } while (getYesNoInput("Would you like to add another qualification?"));
+        }
+
+        String experience = getInput("Experience required (years):");
+
+        Time startTime = getTimeInput("Enter the start time for the requirement");
+
+        List<String> daysOfWeek = getDaysOfWeekInput("Select the days of the week the requirement is for:");
+
+        TeachingRequirement newRequirement = new TeachingRequirement(subject, qualifications, experience, startTime, daysOfWeek);
+        teachingRequirementService.addTeachingRequirement(newRequirement);
+    }
 
 }
+
