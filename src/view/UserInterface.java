@@ -223,7 +223,7 @@ public class UserInterface {
         List<Teacher> perfectMatches = new ArrayList<Teacher>();
         List<Teacher> onlySubjectMatches = new ArrayList<Teacher>();
         List<Teacher> allQualMatches = new ArrayList<Teacher>();
-        int qualsRequired = req.getQualificationsRequired().length;
+        int qualsRequired = req.getQualificationsRequired().size();
         for (Teacher teacher : teacherService.getAllTeachers()) {
             boolean subjectMatch = false;
             boolean allQualMatch = false;
@@ -488,6 +488,7 @@ public class UserInterface {
 
         TrainingSession newSession = new TrainingSession(date, selectedTeacher, subject, course);
         trainingSessionService.addTrainingSession(newSession);
+        selectedTeacher.addTrainingSession(newSession);
 
         System.out.println("Training Session Scheduled:");
         System.out.println(newSession);

@@ -95,6 +95,10 @@ public class Teacher implements Serializable, Identifiable {
     public void setTrainingSessions(List<TrainingSession> trainingSessions) {
         this.trainingSessions = trainingSessions;
     }
+
+    public void addTrainingSession(TrainingSession trainingSession) {
+        trainingSessions.add(trainingSession);
+    }
     
     // check this
     public String displayAvailabilities() {
@@ -114,8 +118,10 @@ public class Teacher implements Serializable, Identifiable {
         String qualificationsFormatted = String.join(", ", qualifications);
         String canTeachFormatted = String.join(", ", canTeach);
         String trainingSessionsFormatted = trainingSessions.stream()
-                .map(TrainingSession::toString) // Assuming TrainingSession has a meaningful toString implementation
-                .collect(Collectors.joining("; "));
+                .map(session -> "Date: " + session.getDate() +
+                        ", Subject: " + session.getSubject() +
+                        ", Course: " + session.getCourse())
+                .collect(Collectors.joining(", "));
 
         return "Teacher Information:\n" +
                 "  Name: " + name + "\n" +
