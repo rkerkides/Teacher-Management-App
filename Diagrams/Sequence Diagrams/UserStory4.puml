@@ -1,9 +1,13 @@
 @startuml
-actor Administrator
-entity "Matching System" as MatchingSystem
-Administrator -> MatchingSystem: initiates the matching process.
-MatchingSystem -> MatchingSystem: retrieves teaching requirements and teacher information.
-MatchingSystem -> MatchingSystem: applies matching criteria.
-MatchingSystem -> Administrator: presents potential matches.
-Administrator -> MatchingSystem: approves or modifies the matches.
+actor "Administrator" as Admin
+participant "User Interface" as UI
+database "Teacher Database" as TDB
+database "Requirements Database" as RDB
+
+Admin -> UI : Select teaching requirement
+UI -> TDB : Fetch available teachers
+UI -> RDB : Fetch teaching requirement details
+TDB -> UI : Return available teachers
+RDB -> UI : Return requirement details
+UI -> Admin : Display matched teachers for requirement
 @enduml

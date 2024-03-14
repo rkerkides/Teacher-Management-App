@@ -1,7 +1,15 @@
 @startuml
-actor Administrator
-entity System
-Administrator -> System: requests to view teaching requirements.
-System -> System: retrieves the requirements from storage.
-System -> Administrator: displays the requirements to the Administrator.
+actor "Administrator" as Admin
+participant "User Interface" as UI
+database "System Database" as DB
+
+Admin -> UI : Request to view teaching requirements
+UI -> DB : Fetch teaching requirements
+alt Teaching requirements exist
+    DB -> UI : Return teaching requirements
+    UI -> Admin : Display teaching requirements
+else No teaching requirements
+    DB -> UI : Return no requirements message
+    UI -> Admin : Display "No requirements available" message
+end
 @enduml

@@ -1,6 +1,0 @@
-@startuml
-entity System
-System -> System: application start-up triggers data load.
-System -> System: reads data from storage.
-System -> System: populates the application with the loaded data.
-@enduml

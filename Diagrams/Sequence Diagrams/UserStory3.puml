@@ -1,7 +1,10 @@
 @startuml
-actor Administrator
-database "Database System" as DatabaseSystem
-Administrator -> DatabaseSystem: adds, updates, or removes teacher information.
-DatabaseSystem -> DatabaseSystem: processes the action.
-DatabaseSystem -> Administrator: confirms the action completion.
+actor "Administrator" as Admin
+participant "User Interface" as UI
+database "Teacher Database" as DB
+
+Admin -> UI : Add/Remove/Update teacher record
+UI -> DB : Perform database manipulation
+DB -> UI : Feedback on operation success/failure
+UI -> Admin : Display feedback
 @enduml

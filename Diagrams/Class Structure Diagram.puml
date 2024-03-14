@@ -12,7 +12,93 @@ class Teacher {
     - name: String
     - availabilities: Date[]
     - qualifications: String[]
-    - experience: String
+    - @startuml
+
+      class Teacher {
+        - id: int
+        - name: String
+        - twoHourSlotAvailabilities: List<Time>
+        - daysOfWeekAvailable: List<String>
+        - qualifications: List<String>
+        - experience: String
+        - canTeach: List<String>
+        - trainingSessions: List<TrainingSession>
+        - teachingRequirements: List<TeachingRequirement>
+        + Teacher(name: String, twoHourSlotAvailabilities: List<Time>, qualifications: List<String>, experience: String, canTeach: List<String>, trainingSessions: List<TrainingSession>, daysOfWeekAvailable: List<String>, teachingRequirements: List<TeachingRequirement>)
+      }
+
+      class TeachingRequirement {
+        - id: int
+        - subject: String
+        - qualificationsRequired: List<String>
+        - experience: String
+        - teacher: Teacher
+        - startTime: Time
+        - daysOfWeek: List<String>
+        + TeachingRequirement(subject: String, qualificationsRequired: List<String>, experience: String, startTime: Time, daysOfWeek: List<String>)
+      }
+
+      class TrainingSession {
+        - id: int
+        - day: String
+        - twoHourSlotStartTime: Time
+        - teacher: Teacher
+        - subject: String
+        + TrainingSession(day: String, teacher: Teacher, subject: String, twoHourSlotStartTime: Time)
+      }
+
+      interface Identifiable {
+        + getId(): int
+      }
+
+      class FileGenericDAO<T> {
+        - entities: Map<Integer, T>
+        - filePath: String
+        - entityType: Class<T>
+        + FileGenericDAO(filePath: String, entityType: Class<T>)
+      }
+
+      interface GenericDAO<T> {
+        + addEntity(T)
+        + getEntity(int): Optional<T>
+        + updateEntity(T)
+        + removeEntity(T)
+        + getAllEntities(): List<T>
+      }
+
+      class TeacherService {
+        - teacherDAO: GenericDAO<Teacher>
+        + TeacherService(teacherDAO: GenericDAO<Teacher>)
+      }
+
+      class TeachingRequirementService {
+        - teachingRequirementDAO: GenericDAO<TeachingRequirement>
+        + TeachingRequirementService(teachingRequirementDAO: GenericDAO<TeachingRequirement>)
+      }
+
+      class TrainingSessionService {
+        - trainingSessionDAO: GenericDAO<TrainingSession>
+        + TrainingSessionService(trainingSessionDAO: GenericDAO<TrainingSession>)
+      }
+
+      Teacher ..|> Identifiable : implements
+      TeachingRequirement ..|> Identifiable : implements
+      TrainingSession ..|> Identifiable : implements
+
+      Teacher "1" -- "M" TeachingRequirement : fulfils >
+      Teacher "J" -- "N" TrainingSession : requires >
+
+      TeacherService ..> Teacher : uses
+      TeachingRequirementService ..> TeachingRequirement : uses
+      TrainingSessionService ..> TrainingSession : uses
+
+      FileGenericDAO ..|> GenericDAO : implements
+      TeacherService -- FileGenericDAO : uses
+      TeachingRequirementService -- FileGenericDAO : uses
+      TrainingSessionService -- FileGenericDAO : uses
+
+      @enduml
+: String
     - canTeach: List<Subject>
     - trainingSessions: List<TrainingSession>
 }

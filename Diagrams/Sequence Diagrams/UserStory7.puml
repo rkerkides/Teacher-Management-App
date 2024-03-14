@@ -1,6 +1,13 @@
 @startuml
-entity System
-System -> System: trigger event to save data (e.g., application close).
-System -> System: gathers current state data.
-System -> System: writes data to storage.
+actor "Administrator" as Admin
+participant "User Interface" as UI
+database "Teacher Database" as TDB
+database "Requirements Database" as RDB
+
+Admin -> UI : Assign teacher to requirement
+UI -> TDB : Update teacher availability
+UI -> RDB : Update requirement status
+TDB -> UI : Confirm availability update
+RDB -> UI : Confirm requirement status update
+UI -> Admin : Display real-time updates
 @enduml
