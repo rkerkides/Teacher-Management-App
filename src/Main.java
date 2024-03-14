@@ -10,9 +10,12 @@ import view.UserInterface;
 public class Main {
     public static void main(String[] args) {
         // Instantiate DAOs first to ensure IdGenerator is initialized
-        FileGenericDAO<Teacher> teacherDAO = new FileGenericDAO<>("data/teachers.ser", Teacher.class);
-        FileGenericDAO<TeachingRequirement> teachingRequirementDAO = new FileGenericDAO<>("data/teachingRequirements.ser", TeachingRequirement.class);
-        FileGenericDAO<TrainingSession> trainingSessionDAO = new FileGenericDAO<>("data/trainingSessions.ser", TrainingSession.class);
+        FileGenericDAO<Teacher> teacherDAO = new FileGenericDAO<>(
+                "data/teachers.ser", Teacher.class);
+        FileGenericDAO<TeachingRequirement> teachingRequirementDAO = new FileGenericDAO<>(
+                "data/teachingRequirements.ser", TeachingRequirement.class);
+        FileGenericDAO<TrainingSession> trainingSessionDAO = new FileGenericDAO<>(
+                "data/trainingSessions.ser", TrainingSession.class);
 
         // Instantiate services with the DAOs
         TeacherService teacherService = new TeacherService(teacherDAO);

@@ -23,7 +23,8 @@ public class Teacher implements Serializable, Identifiable {
     private List<TeachingRequirement> teachingRequirements;
 
     public Teacher(String name, List<Time> twoHourSlotAvailabilities, List<String> qualifications, String experience,
-                   List<String> canTeach, List<TrainingSession> trainingSessions, List<String> daysOfWeekAvailable, List<TeachingRequirement> teachingRequirements) {
+                   List<String> canTeach, List<TrainingSession> trainingSessions, List<String> daysOfWeekAvailable,
+                   List<TeachingRequirement> teachingRequirements) {
         this.id = IdGenerator.generateTeacherId(); // Use IdGenerator for ID
         this.name = name;
         this.twoHourSlotAvailabilities = twoHourSlotAvailabilities;
@@ -163,7 +164,7 @@ public class Teacher implements Serializable, Identifiable {
                 "  Name: " + name + "\n" +
                 "  ID: " + id + "\n" +
                 "  Experience: " + experience + "\n" +
-                "  Training Availabilities: " + availabilitiesFormatted + "\n" +
+                "  Semester-Long Availabilities: " + availabilitiesFormatted + "\n" +
                 "  Days of Week Available: " + daysOfWeekAvailableFormatted + "\n" +
                 "  Qualifications: " + qualificationsFormatted + "\n" +
                 "  Can Teach: " + canTeachFormatted + "\n" +

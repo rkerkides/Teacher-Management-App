@@ -326,11 +326,17 @@ public class UserInterface {
         if (optionalTeacher.isEmpty()) {
             System.out.println("Teacher not found.");
             return;
+        } else if (!(optionalTeacher.get().getAvailabilities().contains(req.getStartTime()) && optionalTeacher.get().
+                getDaysOfWeekAvailable().contains(req.getDaysOfWeek()))) {
+            System.out.println("\nTeacher " + optionalTeacher.get().getName() +" (ID:" + optionalTeacher.get().getId()
+                    + ") is not available at time: " + req.getStartTime());
+            return;
         }
 
         Teacher teacher = optionalTeacher.get();
         req.setTeacher(teacher);
         teachingRequirementService.updateTeachingRequirement(req);
+        teacher.getAvailabilities().remove(req.getStartTime()); // Remove the time slot from the teacher's availability
         teacher.addTeachingRequirement(req);
         teacherService.updateTeacher(teacher);
         System.out.println("Teacher associated with requirement successfully.");
@@ -380,7 +386,7 @@ public class UserInterface {
         }
 
         // Add availabilities
-        if (getYesNoInput("Would you like to add availabilities?")) {
+        if (getYesNoInput("Would you like to add semester-long time availabilities?")) {
             do {
                 availabilities.add(getTimeInput("Enter an availability"));
             } while (getYesNoInput("Would you like to add another availability?"));
@@ -438,7 +444,7 @@ public class UserInterface {
             teacher.setQualifications(newQualifications);
         }
 
-        if (getYesNoInput("Would you like to add to the teacher's time availabilities?")) {
+        if (getYesNoInput("Would you like to add to the teacher's semester-long time availabilities?")) {
             List<Time> newAvailabilities = new ArrayList<>();
             do {
                 Time time = getTimeInput("Enter a new availability");
@@ -543,10 +549,6 @@ public class UserInterface {
 
         Time timeSlot = getTimeInput("Enter the start time for the 2-hour training session");
 
-        if (!selectedTeacher.getAvailabilities().contains(timeSlot)) {
-            showMessage("Invalid selection or teacher is not available at this time.");
-            return;
-        }
         String subject = getInput("Enter the subject for the training session:");
 
         // Assuming a method to create and add a training session to the system and teacher
