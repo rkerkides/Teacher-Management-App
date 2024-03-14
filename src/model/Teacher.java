@@ -2,6 +2,7 @@ package model;
 
 import util.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Teacher implements Serializable, Identifiable {
+    @Serial
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private final int id;
     private String name;
@@ -74,10 +76,6 @@ public class Teacher implements Serializable, Identifiable {
         this.qualifications = qualifications;
     }
 
-    public String getExperience() {
-        return experience;
-    }
-
     public void setExperience(String experience) {
         this.experience = experience;
     }
@@ -90,46 +88,13 @@ public class Teacher implements Serializable, Identifiable {
         this.canTeach = canTeach;
     }
 
-    public List<TrainingSession> getTrainingSessions() {
-        return trainingSessions;
-    }
-
-    public void setTrainingSessions(List<TrainingSession> trainingSessions) {
-        this.trainingSessions = trainingSessions;
-    }
-
     public void addTrainingSession(TrainingSession trainingSession) {
         trainingSessions.add(trainingSession);
-    }
-
-    public void removeTrainingSession(TrainingSession trainingSession) {
-        trainingSessions.remove(trainingSession);
-    }
-
-    public List<TeachingRequirement> getTeachingRequirements() {
-        return teachingRequirements;
-    }
-
-    public void setTeachingRequirements(List<TeachingRequirement> teachingRequirements) {
-        this.teachingRequirements = teachingRequirements;
     }
 
     public void addTeachingRequirement(TeachingRequirement teachingRequirement) {
         teachingRequirements.add(teachingRequirement);
     }
-
-    public void removeTeachingRequirement(TeachingRequirement teachingRequirement) {
-        teachingRequirements.remove(teachingRequirement);
-    }
-    
-    // check this
-    public String displayAvailabilities() {
-        return "Teacher{" +
-                "id=" + id +
-                ", twoHourSlotAvailabilities=" + twoHourSlotAvailabilities +
-                '}';
-    }
-
     @Override
     public String toString() {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");

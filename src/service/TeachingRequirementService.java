@@ -37,17 +37,5 @@ public class TeachingRequirementService {
             return false;
         }
     }
-
-    public boolean removeTeachingRequirement(int id) {
-        // Remove a teaching requirement by id and handle non-existent requirements
-        Optional<TeachingRequirement> teachingRequirement = getTeachingRequirement(id);
-        if (teachingRequirement.isPresent()) {
-            teachingRequirementDAO.removeEntity(teachingRequirement.get());
-            return true;
-        } else {
-            // Log or handle the case where the teaching requirement does not exist
-            return false;
-        }
-    }
 }
 

@@ -2,16 +2,15 @@ package model;
 
 import util.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-
-//@ Abs changes to Teaching requirements, including new variables
-
 // Represents a 2-hour semester-long slot for a teacher to teach a subject
 public class TeachingRequirement implements Serializable, Identifiable {
-    private static final long serialVersionUID = 1L; 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final int id;
     private String subject;
     private List<String> qualificationsRequired; 
@@ -32,15 +31,7 @@ public class TeachingRequirement implements Serializable, Identifiable {
         this.daysOfWeek = daysOfWeek != null ? daysOfWeek : new ArrayList<>();
     }
 
-    // Getters and Setters for new variables
-    public String getExperience() {
-        return experience;
-    }
-
-    public void setExperience(String experience) {
-        this.experience = experience;
-    }
-
+    // Getters and Setters
     @Override
     public int getId() {
         return id;
@@ -50,32 +41,16 @@ public class TeachingRequirement implements Serializable, Identifiable {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public List<String> getQualificationsRequired() {
         return qualificationsRequired;
-    }
-
-    public void setQualificationsRequired(List<String> qualificationsRequired) {
-        this.qualificationsRequired = qualificationsRequired;
     }
 
     public List<String> getDaysOfWeek() {
         return daysOfWeek;
     }
 
-    public void setDaysOfWeek(List<String> daysOfWeek) {
-        this.daysOfWeek = daysOfWeek;
-    }
-
     public Time getStartTime() {
         return startTime;
-    }
-
-    public void setStartTime(Time startTime) {
-        this.startTime = startTime;
     }
 
     public Teacher getTeacher() {

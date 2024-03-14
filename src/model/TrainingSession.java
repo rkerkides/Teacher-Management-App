@@ -2,11 +2,13 @@ package model;
 
 import util.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 public class TrainingSession implements Serializable, Identifiable {
+    @Serial
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private final int id;
     private String day;
@@ -32,10 +34,6 @@ public class TrainingSession implements Serializable, Identifiable {
         return day;
     }
 
-    public void setDay(String day) {
-        this.day = day;
-    }
-
     public Teacher getTeacher() {
         return teacher;
     }
@@ -44,20 +42,8 @@ public class TrainingSession implements Serializable, Identifiable {
         this.teacher = teacher;
     }
 
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public Time getTwoHourSlotStartTime() {
         return twoHourSlotStartTime;
-    }
-
-    public void setTwoHourSlotStartTime(Time twoHourSlotStartTime) {
-        this.twoHourSlotStartTime = twoHourSlotStartTime;
     }
 
     @Override

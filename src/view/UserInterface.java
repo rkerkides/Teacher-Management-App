@@ -82,19 +82,6 @@ public class UserInterface {
         }
     }
 
-    public Date getDateInput(String prompt) {
-        System.out.println(prompt + " (YYYY-MM-DD)");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        while (true) {
-            String input = scanner.nextLine().trim();
-            try {
-                return formatter.parse(input);
-            } catch (ParseException e) {
-                System.out.println("Invalid input. Please enter a date in the format YYYY-MM-DD.");
-            }
-        }
-    }
-
     public Time getTimeInput(String prompt) {
         System.out.println(prompt + " (HH:MM)");
         SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
@@ -146,25 +133,6 @@ public class UserInterface {
 
     public void showMessage(String message) {
         System.out.println(message);
-    }
-
-    public Date inputDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = null;
-        while (date == null) {
-            String dateString = getInput("Enter the date (dd/MM/yyyy):");
-            try {
-                date = dateFormat.parse(dateString);
-                // Additional check to ensure the date is in the future
-                if (date.before(new Date())) {
-                    System.out.println("The date must be in the future. Please try again.");
-                    date = null; // Reset date to loop again if not in the future
-                }
-            } catch (ParseException e) {
-                System.out.println("Invalid date format. Please use dd/MM/yyyy.");
-            }
-        }
-        return date;
     }
 
     /**
