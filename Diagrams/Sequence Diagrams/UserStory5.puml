@@ -1,8 +1,10 @@
 @startuml
-actor Administrator
-entity "Scheduling System" as SchedulingSystem
-Administrator -> SchedulingSystem: decides to schedule training.
-SchedulingSystem -> Administrator: presents available slots.
-Administrator -> SchedulingSystem: selects appropriate slots and assigns teachers.
-SchedulingSystem -> Administrator: confirms the training schedule.
+actor "Administrator" as Admin
+participant "User Interface" as UI
+database "Training Session Database" as TSD
+
+Admin -> UI : Schedule training session
+UI -> TSD : Save training session details
+TSD -> UI : Confirmation of scheduling
+UI -> Admin : Display confirmation message
 @enduml

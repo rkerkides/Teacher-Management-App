@@ -2,23 +2,27 @@ package model;
 
 import util.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 public class TrainingSession implements Serializable, Identifiable {
+    @Serial
     private static final long serialVersionUID = 1L; // ensures class version compatibility
     private final int id;
-    private Date date;
+    private String day;
+    private Time twoHourSlotStartTime;
     private Teacher teacher;
     private String subject;
-    private String course;
 
     // Constructor
-    public TrainingSession(Date date, Teacher teacher, String subject, String course) {
+    public TrainingSession(String day, Teacher teacher, String subject, Time twoHourSlotStartTime) {
         this.id = IdGenerator.generateTrainingSessionId();
-        this.date = date;
+        this.day = day;
         this.teacher = teacher;
         this.subject = subject;
-        this.course = course;
+        this.twoHourSlotStartTime = twoHourSlotStartTime;
     }
 
     // Getters and Setters
@@ -26,12 +30,8 @@ public class TrainingSession implements Serializable, Identifiable {
         return id;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    public String getDay() {
+        return day;
     }
 
     public Teacher getTeacher() {
@@ -42,30 +42,24 @@ public class TrainingSession implements Serializable, Identifiable {
         this.teacher = teacher;
     }
 
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
+    public Time getTwoHourSlotStartTime() {
+        return twoHourSlotStartTime;
     }
 
     @Override
     public String toString() {
-        return "TrainingSession{" +
-                "id=" + id +
-                ", date=" + date +
-                ", teacher=" + teacher +
-                ", subject='" + subject + '\'' +
-                ", course='" + course + '\'' +
-                '}';
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        String twoHourSlotFormatted = timeFormat.format(twoHourSlotStartTime) + " - " +
+                timeFormat.format(new Time(twoHourSlotStartTime.getTime() + 7200000)); // Adding 2 hours in milliseconds for end time
+
+        // For teacher, only include non-recursive information, like name or ID
+        String teacherInfo = "ID: " + teacher.getId() + ", Name: " + teacher.getName();
+
+        return "Training Session Information:\n" +
+                "  ID: " + id + "\n" +
+                "  Day of the Week: " + day + "\n" +
+                "  Teacher: {" + teacherInfo + "}\n" +
+                "  Subject: " + subject + "\n" +
+                "  Two Hour Slot Start Time: " + twoHourSlotFormatted;
     }
 }

@@ -1,9 +1,10 @@
 @startuml
-actor "Class Director" as ClassDirector
-entity "System Interface" as SystemInterface
-ClassDirector -> SystemInterface: initiates the action to input teaching requirements.
-SystemInterface -> SystemInterface: provides a form or interface to enter requirements.
-ClassDirector -> SystemInterface: inputs details: course names, number of teachers needed, qualifications.
-SystemInterface -> System: sends the data to the backend system.
-System -> System: stores the requirements.
+actor "Class Director" as CD
+participant "User Interface" as UI
+database "System Database" as DB
+
+CD -> UI : Input teaching requirements
+UI -> DB : Save requirements
+DB -> UI : Confirmation of save
+UI -> CD : Display confirmation message
 @enduml

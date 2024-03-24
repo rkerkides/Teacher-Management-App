@@ -2,45 +2,36 @@ package model;
 
 import util.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
-//@ Abs changes to Teaching requirements, including new variables
+// Represents a 2-hour semester-long slot for a teacher to teach a subject
 public class TeachingRequirement implements Serializable, Identifiable {
-    private static final long serialVersionUID = 1L; 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final int id;
     private String subject;
     private List<String> qualificationsRequired; 
     private String experience;
-    private String educationLevel;
+    private Teacher teacher;
+    private Time startTime;
+    private List<String> daysOfWeek;
 
-    public TeachingRequirement(String subject, List<String> qualificationsRequired, String experience, String educationLevel) {
+    public TeachingRequirement(String subject, List<String> qualificationsRequired, String experience,
+                               Time startTime, List<String> daysOfWeek) {
         this.id = IdGenerator.generateTeachingRequirementId();
         this.subject = subject;
-        this.qualificationsRequired = qualificationsRequired;
+        // Ensure that the lists are not null by initializing to empty lists if null is passed
+        this.qualificationsRequired = qualificationsRequired != null ? qualificationsRequired : new ArrayList<>();
         this.experience = experience;
-        this.educationLevel = educationLevel;
+        this.teacher = null; // Initialized to null to indicate no teacher assigned yet
+        this.startTime = startTime;
+        this.daysOfWeek = daysOfWeek != null ? daysOfWeek : new ArrayList<>();
     }
 
-    // Getters and Setters for new variables
-    public String getExperience() {
-        return experience;
-    }
-
-    public void setExperience(String experience) {
-        this.experience = experience;
-    }
-
-    public String getEducationLevel() {
-        return educationLevel;
-    }
-
-    public void setEducationLevel(String educationLevel) {
-        this.educationLevel = educationLevel;
-    }
-    
-    // Existing getters and setters, no change needed
-
+    // Getters and Setters
     @Override
     public int getId() {
         return id;
@@ -50,24 +41,43 @@ public class TeachingRequirement implements Serializable, Identifiable {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public List<String> getQualificationsRequired() {
         return qualificationsRequired;
     }
 
-    public void setQualificationsRequired(List<String> qualificationsRequired) {
-        this.qualificationsRequired = qualificationsRequired;
+    public List<String> getDaysOfWeek() {
+        return daysOfWeek;
     }
-    
+
+    public Time getStartTime() {
+        return startTime;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
     @Override
     public String toString() {
-        String display = "ID " + id + ": " + subject;
-        display += " {Qualifications Required: " + Arrays.toString(qualificationsRequired.toArray()) + ", ";
-        display += "Experience: " + experience + ", ";
-        display += "Education Level: " + educationLevel + "}";
-        return display;
+        // Using String.join to handle list conversions, ensuring no null lists
+        String qualificationsFormatted = qualificationsRequired.isEmpty() ? "None specified" :
+                String.join(", ", qualificationsRequired);
+        String daysOfWeekFormatted = daysOfWeek.isEmpty() ? "Not specified" :
+                String.join(", ", daysOfWeek);
+        String teacherName = teacher == null ? "Unassigned" : teacher.getName();
+
+        return "Teaching Requirement Information:\n" +
+                "  ID: " + id + "\n" +
+                "  Subject: " + subject + "\n" +
+                "  Days of Week: " + daysOfWeekFormatted + "\n" +
+                "  Time Slot: " + (startTime != null ? startTime + " to " + new Time(startTime.getTime() + 7200000) :
+                "Not specified") + "\n" +
+                "  Qualifications Preferred: [" + qualificationsFormatted + "]\n" +
+                "  Experience Preferred: " + experience + " years\n" +
+                "  Teacher Assigned: " + teacherName + "\n";
     }
 }
