@@ -1,20 +1,31 @@
 @startuml
 
-class TeachingRequirement {
-    - id: int
-    - subject: String
-    - qualificationsRequired: String[]
-    - courseNames: String[]
+package view {
+    class UserInterface {
+        - scanner: Scanner
+        - teacherService: TeacherService
+        - teachingRequirementService: TeachingRequirementService
+        - trainingSessionService: TrainingSessionService
+        + getInstance(): UserInterface
+        + setTeacherService(TeacherService): void
+        + setTeachingRequirementService(TeachingRequirementService): void
+        + setTrainingSessionService(TrainingSessionService): void
+        + displayMainMenu(): void
+    }
 }
 
-class Teacher {
-    - id: int
-    - name: String
-    - availabilities: Date[]
-    - qualifications: String[]
-    - @startuml
+package model {
+    class TeachingRequirement {
+        - id: int
+        - subject: String
+        - qualificationsRequired: List<String>
+        - experienceRequired: String
+        - startTime: Time
+        - daysOfWeek: List<String>
+        - teacher: Teacher
+    }
 
-      class Teacher {
+    class Teacher {
         - id: int
         - name: String
         - twoHourSlotAvailabilities: List<Time>
@@ -24,148 +35,67 @@ class Teacher {
         - canTeach: List<String>
         - trainingSessions: List<TrainingSession>
         - teachingRequirements: List<TeachingRequirement>
-        + Teacher(name: String, twoHourSlotAvailabilities: List<Time>, qualifications: List<String>, experience: String, canTeach: List<String>, trainingSessions: List<TrainingSession>, daysOfWeekAvailable: List<String>, teachingRequirements: List<TeachingRequirement>)
-      }
+    }
 
-      class TeachingRequirement {
-        - id: int
-        - subject: String
-        - qualificationsRequired: List<String>
-        - experience: String
-        - teacher: Teacher
-        - startTime: Time
-        - daysOfWeek: List<String>
-        + TeachingRequirement(subject: String, qualificationsRequired: List<String>, experience: String, startTime: Time, daysOfWeek: List<String>)
-      }
-
-      class TrainingSession {
+    class TrainingSession {
         - id: int
         - day: String
         - twoHourSlotStartTime: Time
         - teacher: Teacher
         - subject: String
-        + TrainingSession(day: String, teacher: Teacher, subject: String, twoHourSlotStartTime: Time)
-      }
+    }
+}
 
-      interface Identifiable {
-        + getId(): int
-      }
+package service {
+    interface GenericDAO {
+        + addEntity(T): void
+        + getEntity(int): Optional<T>
+        + updateEntity(T): void
+        + removeEntity(T): void
+        + getAllEntities(): List<T>
+    }
 
-      class FileGenericDAO<T> {
+    class FileGenericDAO {
         - entities: Map<Integer, T>
         - filePath: String
         - entityType: Class<T>
-        + FileGenericDAO(filePath: String, entityType: Class<T>)
-      }
+    }
 
-      interface GenericDAO<T> {
-        + addEntity(T)
-        + getEntity(int): Optional<T>
-        + updateEntity(T)
-        + removeEntity(T)
-        + getAllEntities(): List<T>
-      }
-
-      class TeacherService {
+    class TeacherService {
         - teacherDAO: GenericDAO<Teacher>
-        + TeacherService(teacherDAO: GenericDAO<Teacher>)
-      }
+    }
 
-      class TeachingRequirementService {
+    class TeachingRequirementService {
         - teachingRequirementDAO: GenericDAO<TeachingRequirement>
-        + TeachingRequirementService(teachingRequirementDAO: GenericDAO<TeachingRequirement>)
-      }
+    }
 
-      class TrainingSessionService {
+    class TrainingSessionService {
         - trainingSessionDAO: GenericDAO<TrainingSession>
-        + TrainingSessionService(trainingSessionDAO: GenericDAO<TrainingSession>)
-      }
-
-      Teacher ..|> Identifiable : implements
-      TeachingRequirement ..|> Identifiable : implements
-      TrainingSession ..|> Identifiable : implements
-
-      Teacher "1" -- "M" TeachingRequirement : fulfils >
-      Teacher "J" -- "N" TrainingSession : requires >
-
-      TeacherService ..> Teacher : uses
-      TeachingRequirementService ..> TeachingRequirement : uses
-      TrainingSessionService ..> TrainingSession : uses
-
-      FileGenericDAO ..|> GenericDAO : implements
-      TeacherService -- FileGenericDAO : uses
-      TeachingRequirementService -- FileGenericDAO : uses
-      TrainingSessionService -- FileGenericDAO : uses
-
-      @enduml
-: String
-    - canTeach: List<Subject>
-    - trainingSessions: List<TrainingSession>
+    }
 }
 
-class TeacherDatabase {
-    - teachers: Teacher[]
-    + addTeacher(teacher: Teacher): void
-    + updateTeacher(teacher: Teacher): void
-    + deleteTeacher(teacherId: int): void
-    + getTeacher(teacherId: int): Teacher
-    + loadFromFile(): void
-    + saveToFile(): void
+interface Identifiable {
+    + getId(): int
 }
 
-class MatchingSystem {
-    + retrieveRequirements(semester: String): TeachingRequirement[]
-    + retrieveTeacherInfo(): Teacher[]
-    + matchTeachersWithRequirements(teachingRequirements: TeachingRequirement[], teachers: Teacher[]): Match[]
-}
+UserInterface ..> TeacherService : uses >
+UserInterface ..> TeachingRequirementService : uses >
+UserInterface ..> TrainingSessionService : uses >
 
-class Administrator {
-    + displayAllTeachingRequirements(semester: String): void
-    + inputTeacher(teacher: Teacher): void
-    + matchCoursesToTeachers(): void
-}
+Teacher ..|> Identifiable : implements
+TeachingRequirement ..|> Identifiable : implements
+TrainingSession ..|> Identifiable : implements
 
-class ClassDirector {
-    + inputTeachingRequirement(requirement: TeachingRequirement): void
-    + viewTeachingRequirement(semester: String): void
-}
+Teacher "1" -- "M" TeachingRequirement : fulfils >
+Teacher "J" -- "N" TrainingSession : attends >
 
-class SchedulingSystem {
-    + presentAvailableSlots(): TrainingSession[]
-    + confirmSchedule(trainingSessions: TrainingSession[]): void
-}
+TeacherService ..> Teacher : uses
+TeachingRequirementService ..> TeachingRequirement : uses
+TrainingSessionService ..> TrainingSession : uses
 
-class TrainingSession {
-    - id: int
-    - date: Date
-    - teacher: Teacher
-    - subject: String
-    - course: String
-}
-
-class SystemInterface {
-    + inputTeachingRequirements(): void
-    + viewTeachingRequirements(): void
-    + maintainTeacherDatabase(): void
-}
-
-class System {
-    - teachingRequirements: TeachingRequirement[]
-    - teachers: Teacher[]
-    + saveData(): void
-    + loadData(): void
-}
-
-TeachingRequirement "1" *-- "1" System : contains >
-Teacher "1" *-- "1" System : contains >
-Teacher "1" -- "1" TeacherDatabase : stored in >
-SystemInterface "1" -- "1" System : uses >
-MatchingSystem "1" -- "1" System : uses >
-SchedulingSystem "1" -- "1" System : uses >
-Administrator "1" -- "1" System : uses >
-ClassDirector "1" -- "1" System : uses >
-TeacherDatabase "1" -- "1" System : uses >
-TrainingSession "*" -- "1" Teacher : conducted for >
-TrainingSession "*" -- "1" TeachingRequirement : addresses >
+FileGenericDAO ..> GenericDAO : implements
+TeacherService -- FileGenericDAO : uses
+TeachingRequirementService -- FileGenericDAO : uses
+TrainingSessionService -- FileGenericDAO : uses
 
 @enduml
